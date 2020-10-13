@@ -27,14 +27,14 @@ contract LidStakingFund is Initializable {
 
     function() external payable { }
 
-    function releaseLidToAddress(address receiver, uint amount) external returns(uint) {
+    function releaseLidToAddress(address receiver, uint amount) external {
         require(msg.sender == releaser, "Can only be called releaser.");
         require(amount <= totalLidAuthorized.sub(totalLidReleased), "Cannot release more Lid than available.");
         totalLidReleased = totalLidReleased.add(amount);
         lidToken.transfer(receiver, amount);
     }
 
-    function authorizeLid(uint amount) external returns (uint) {
+    function authorizeLid(uint amount) external {
         require(msg.sender == authorizor, "Can only be called authorizor.");
         totalLidAuthorized = totalLidAuthorized.add(amount);
     }

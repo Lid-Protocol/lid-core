@@ -34,26 +34,26 @@ contract LidPromoFund is Initializable {
 
     function() external payable { }
 
-    function releaseLidToAddress(address receiver, uint amount) external returns(uint) {
+    function releaseLidToAddress(address receiver, uint amount) external {
         require(msg.sender == releaser || releasers[msg.sender], "Can only be called releaser.");
         require(amount <= totalLidAuthorized.sub(totalLidReleased), "Cannot release more Lid than available.");
         totalLidReleased = totalLidReleased.add(amount);
         lidToken.transfer(receiver, amount);
     }
 
-    function authorizeLid(uint amount) external returns (uint) {
+    function authorizeLid(uint amount) external {
         require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
         totalLidAuthorized = totalLidAuthorized.add(amount);
     }
 
-    function releaseEthToAddress(address payable receiver, uint amount) external returns(uint) {
+    function releaseEthToAddress(address payable receiver, uint amount) external {
         require(msg.sender == releaser || releasers[msg.sender], "Can only be called releaser.");
         require(amount <= totalEthAuthorized.sub(totalEthReleased), "Cannot release more Eth than available.");
         totalEthReleased = totalEthReleased.add(amount);
         receiver.transfer(amount);
     }
 
-    function authorizeEth(uint amount) external returns (uint) {
+    function authorizeEth(uint amount) external {
         require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
         totalEthAuthorized = totalEthAuthorized.add(amount);
     }
