@@ -20,9 +20,9 @@ contract LidStakingV2 is LidStaking, V2Initializable {
       uint128 value;
   }
 
-  mapping(address => Checkpoint[]) stakeValueHistory;
+  mapping(address => Checkpoint[]) internal stakeValueHistory;
 
-  Checkpoint[] totalStakedHistory;
+  Checkpoint[] internal totalStakedHistory;
 
   ILidCertifiableToken internal lidToken;
 

@@ -20,7 +20,7 @@ contract LidDaoLock is Initializable, Ownable {
 
     ILidCertifiableToken private lidToken;
 
-    address daoWallet;
+    address internal daoWallet;
 
     modifier onlyAfterStart {
         require(releaseStart != 0 && now > releaseStart, "Has not yet started.");
