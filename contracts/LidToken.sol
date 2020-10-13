@@ -82,7 +82,7 @@ contract LidToken is
     }
 
     function setToOnlyTaxExemptStatus(address account, bool status) external onlyOwner {
-        fromOnlyTaxExempt[account] = status;
+        toOnlyTaxExempt[account] = status;
     }
 
     function removeTrustedContract(address contractAddress) external onlyOwner {
