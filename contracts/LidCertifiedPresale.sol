@@ -56,8 +56,8 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
     uint public totalDepositors;
     mapping(address => uint) public referralCounts;
 
-    uint lidRepaired;
-    bool pauseDeposit;
+    uint public lidRepaired;
+    bool public pauseDeposit;
 
     mapping(address => bool) public isRepaired;
 
