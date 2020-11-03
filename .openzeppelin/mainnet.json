@@ -367,11 +367,11 @@
       }
     },
     "LidTeamLock": {
-      "address": "0xEC8E247c4f839701fd4966B3fE1B38dcbdfd6a90",
-      "constructorCode": "608060405234801561001057600080fd5b50611415806100206000396000f3fe",
-      "bodyBytecodeHash": "406e63f20effbcf7c63c7e4eb300969ccd5c4e3a18c9bf9c36567318602dfb18",
-      "localBytecodeHash": "c7a1b7888e9d9a734b3743f5aaf998449af7b2d7d0b4f1e5ce257ba7e0307294",
-      "deployedBytecodeHash": "c7a1b7888e9d9a734b3743f5aaf998449af7b2d7d0b4f1e5ce257ba7e0307294",
+      "address": "0xbb6E1141d2C228f9CFCBE9c72f5889B1BE616936",
+      "constructorCode": "608060405234801561001057600080fd5b50611562806100206000396000f3fe",
+      "bodyBytecodeHash": "67dd1f46533c1d03e026788f8707923e7be40bce4a4dff516a0e084c4d668a5e",
+      "localBytecodeHash": "d155dd79a6867eb22f2ee08319c753a4c3d77b67b089c700d6f3172a3c22b069",
+      "deployedBytecodeHash": "d155dd79a6867eb22f2ee08319c753a4c3d77b67b089c700d6f3172a3c22b069",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -426,105 +426,105 @@
           "contract": "Initializable",
           "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
           "label": "initialized",
-          "astId": 9167,
+          "astId": 10129,
           "type": "t_bool",
-          "src": "757:24:40"
+          "src": "757:24:42"
         },
         {
           "contract": "Initializable",
           "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
           "label": "initializing",
-          "astId": 9169,
+          "astId": 10131,
           "type": "t_bool",
-          "src": "876:25:40"
+          "src": "876:25:42"
         },
         {
           "contract": "Initializable",
           "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
           "label": "______gap",
-          "astId": 9231,
+          "astId": 10193,
           "type": "t_array:50<t_uint256>",
-          "src": "1982:29:40"
+          "src": "1982:29:42"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "releaseInterval",
-          "astId": 2697,
+          "astId": 3505,
           "type": "t_uint256",
-          "src": "369:27:6"
+          "src": "369:27:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "releaseStart",
-          "astId": 2699,
+          "astId": 3507,
           "type": "t_uint256",
-          "src": "403:24:6"
+          "src": "403:24:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "releaseBP",
-          "astId": 2701,
+          "astId": 3509,
           "type": "t_uint256",
-          "src": "434:21:6"
+          "src": "434:21:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "startingLid",
-          "astId": 2703,
+          "astId": 3511,
           "type": "t_uint256",
-          "src": "464:23:6"
+          "src": "464:23:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "startingEth",
-          "astId": 2705,
+          "astId": 3513,
           "type": "t_uint256",
-          "src": "494:23:6"
+          "src": "494:23:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "teamMemberAddresses",
-          "astId": 2708,
+          "astId": 3516,
           "type": "t_array:dyn<t_address_payable>",
-          "src": "526:44:6"
+          "src": "526:44:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "teamMemberBPs",
-          "astId": 2711,
+          "astId": 3519,
           "type": "t_array:dyn<t_uint256>",
-          "src": "577:27:6"
+          "src": "577:27:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "teamMemberClaimedEth",
-          "astId": 2715,
+          "astId": 3523,
           "type": "t_mapping<t_uint256>",
-          "src": "611:52:6"
+          "src": "611:52:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "teamMemberClaimedLid",
-          "astId": 2719,
+          "astId": 3527,
           "type": "t_mapping<t_uint256>",
-          "src": "670:52:6"
+          "src": "670:52:7"
         },
         {
           "contract": "LidTeamLock",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidTeamLock.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidTeamLock.sol",
           "label": "lidToken",
-          "astId": 2721,
+          "astId": 3529,
           "type": "t_address",
-          "src": "731:37:6"
+          "src": "731:37:7"
         }
       ],
       "warnings": {
@@ -1706,7 +1706,7 @@
       {
         "address": "0xaE92978933Bd440Dd657523784D467FF3Fc774a3",
         "version": "1.0.0",
-        "implementation": "0xEC8E247c4f839701fd4966B3fE1B38dcbdfd6a90",
+        "implementation": "0xbb6E1141d2C228f9CFCBE9c72f5889B1BE616936",
         "admin": "0x893FA3626C92b0f313F81c830798D14F73f900a6",
         "kind": "Upgradeable"
       }

@@ -349,6 +349,14 @@ contract LidTeamLock is Initializable {
         releaseStart = now.add(24 hours);
     }
 
+    function migrateMember(uint i, address payable newAddress) external {
+        require(msg.sender == teamMemberAddresses[0], "Must be project lead.");
+        address oldAddress = teamMemberAddresses[i];
+        teamMemberClaimedLid[newAddress] = teamMemberClaimedLid[oldAddress];
+        delete teamMemberClaimedLid[oldAddress];
+        teamMemberAddresses[i] = newAddress;
+    }
+
     function resetTeam(
         address payable[] calldata _teamMemberAddresses,
         uint[] calldata _teamMemberBPs
