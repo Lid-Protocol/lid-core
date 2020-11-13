@@ -89,17 +89,21 @@ contract LidStakingV2 is LidStaking, V2Initializable {
   }
 
   function _superRemoveStake(uint _amount) internal {
-    uint tax = findTaxAmount(_amount, unstakingTaxBP);
-    uint earnings = _amount.sub(tax);
+    //must withdraw all dividends, to prevent overflows
+    withdraw(dividendsOf(msg.sender));
     if (stakeValue[msg.sender] == _amount) totalStakers = totalStakers.sub(1);
     totalStaked = totalStaked.sub(_amount);
     stakeValue[msg.sender] = stakeValue[msg.sender].sub(_amount);
-    uint payout = profitPerShare.mul(_amount).add(tax.mul(DISTRIBUTION_MULTIPLIER));
-    stakerPayouts[msg.sender] = stakerPayouts[msg.sender] - uintToInt(payout);
+
+    uint tax = findTaxAmount(_amount, unstakingTaxBP);
+    uint earnings = _amount.sub(tax);
+    _increaseProfitPerShare(tax);
+    stakerPayouts[msg.sender] = uintToInt(profitPerShare.mul(stakeValue[msg.sender]));
+
     for (uint i=0; i < stakeHandlers.length; i++) {
         stakeHandlers[i].handleUnstake(msg.sender, _amount, stakeValue[msg.sender]);
     }
-    _increaseProfitPerShare(tax);
+    
     require(lidToken.transferFrom(address(this), msg.sender, earnings), "Unstake failed due to failed transfer.");
     emit OnUnstake(msg.sender, _amount, tax);
   }
