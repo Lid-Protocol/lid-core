@@ -1,17 +1,16 @@
 pragma solidity 0.5.16;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Detailed.sol";
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
-import "./LidStakingV2.sol";
+import "./LidStaking.sol";
 import "./LidToken.sol";
 
-contract LidVotingRights is Initializable, ERC20Detailed {
+contract LidVotingRights is Initializable {
 
-  LidStakingV2 public lidStaking;
+  LidStaking public lidStaking;
   LidToken public lidToken;
 
   function initialize(
-    LidStakingV2 _lidStaking,
+    LidStaking _lidStaking,
     LidToken _lidToken
   ) external initializer {
     lidStaking = _lidStaking;

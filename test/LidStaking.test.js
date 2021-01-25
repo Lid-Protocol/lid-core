@@ -4,7 +4,7 @@ const {expect} = require("chai")
 const config = require("../config")
 
 const LidToken = contract.fromArtifact("LidToken")
-const LidStakingV2 = contract.fromArtifact("LidStakingV2")
+const LidStakingV2 = contract.fromArtifact("LidStaking")
 const LidCertifiedPresale = contract.fromArtifact("LidCertifiedPresale")
 const LidDaoFund = contract.fromArtifact("LidDaoLock")
 

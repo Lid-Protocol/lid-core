@@ -1347,11 +1347,11 @@
       }
     },
     "LidStaking": {
-      "address": "0x0dbA21F1e0a7F164a6F4072822F969ad7d4c255D",
-      "constructorCode": "608060405261270f806100136000396000f3fe",
-      "bodyBytecodeHash": "420c7402595a3fbb7f37b7e2b32280f6965333fbc102d2ec6205ae7765367301",
-      "localBytecodeHash": "df341dbe05b2cba03f625e0c2bc39d002e674ba4e0093244787f40872d7c14c8",
-      "deployedBytecodeHash": "df341dbe05b2cba03f625e0c2bc39d002e674ba4e0093244787f40872d7c14c8",
+      "address": "0xF4f70eE3D8562268c84D49939b6AFC0d45b9692b",
+      "constructorCode": "6080604052612c75806100136000396000f3fe",
+      "bodyBytecodeHash": "099d2780d0dac62a0ca7e9d3087f9a305334df043b48fc9cf6567fd3fa8d873f",
+      "localBytecodeHash": "e317ae195a8311e5eec82d3c8abe4fc671f08fca2bd6f5bee38062791a8b87de",
+      "deployedBytecodeHash": "e317ae195a8311e5eec82d3c8abe4fc671f08fca2bd6f5bee38062791a8b87de",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1404,6 +1404,43 @@
           "valueType": "t_bool",
           "label": "mapping(key => bool)",
           "kind": "mapping"
+        },
+        "t_struct<LidStaking.Checkpoint>": {
+          "id": "t_struct<LidStaking.Checkpoint>",
+          "kind": "struct",
+          "label": "LidStaking.Checkpoint",
+          "members": [
+            {
+              "label": "fromBlock",
+              "astId": 1888,
+              "type": "t_uint128",
+              "src": "1658:17:4"
+            },
+            {
+              "label": "value",
+              "astId": 1890,
+              "type": "t_uint128",
+              "src": "1684:13:4"
+            }
+          ]
+        },
+        "t_uint128": {
+          "id": "t_uint128",
+          "kind": "elementary",
+          "label": "uint128"
+        },
+        "t_array:dyn<t_struct<LidStaking.Checkpoint>>": {
+          "id": "t_array:dyn<t_struct<LidStaking.Checkpoint>>",
+          "valueType": "t_struct<LidStaking.Checkpoint>",
+          "length": "dyn",
+          "kind": "array",
+          "label": "LidStaking.Checkpoint[]"
+        },
+        "t_mapping<t_array:dyn<t_struct<LidStaking.Checkpoint>>>": {
+          "id": "t_mapping<t_array:dyn<t_struct<LidStaking.Checkpoint>>>",
+          "valueType": "t_array:dyn<t_struct<LidStaking.Checkpoint>>",
+          "label": "mapping(key => LidStaking.Checkpoint[])",
+          "kind": "mapping"
         }
       },
       "storage": [
@@ -1411,169 +1448,193 @@
           "contract": "Initializable",
           "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
           "label": "initialized",
-          "astId": 9345,
+          "astId": 9934,
           "type": "t_bool",
-          "src": "757:24:40"
+          "src": "757:24:41"
         },
         {
           "contract": "Initializable",
           "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
           "label": "initializing",
-          "astId": 9347,
+          "astId": 9936,
           "type": "t_bool",
-          "src": "876:25:40"
+          "src": "876:25:41"
         },
         {
           "contract": "Initializable",
           "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
           "label": "______gap",
-          "astId": 9409,
+          "astId": 9998,
           "type": "t_array:50<t_uint256>",
-          "src": "1982:29:40"
+          "src": "1982:29:41"
         },
         {
           "contract": "Ownable",
           "path": "@openzeppelin\\contracts-ethereum-package\\contracts\\ownership\\Ownable.sol",
           "label": "_owner",
-          "astId": 8425,
+          "astId": 9014,
           "type": "t_address",
-          "src": "526:22:32"
+          "src": "526:22:33"
         },
         {
           "contract": "Ownable",
           "path": "@openzeppelin\\contracts-ethereum-package\\contracts\\ownership\\Ownable.sol",
           "label": "______gap",
-          "astId": 8538,
+          "astId": 9127,
           "type": "t_array:50<t_uint256>",
-          "src": "2471:29:32"
+          "src": "2471:29:33"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "stakingTaxBP",
-          "astId": 1735,
+          "astId": 1809,
           "type": "t_uint256",
           "src": "571:24:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "unstakingTaxBP",
-          "astId": 1737,
+          "astId": 1811,
           "type": "t_uint256",
           "src": "602:26:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "lidToken",
-          "astId": 1739,
+          "astId": 1813,
           "type": "t_address",
           "src": "635:37:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "stakeValue",
-          "astId": 1743,
+          "astId": 1817,
           "type": "t_mapping<t_uint256>",
           "src": "681:42:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "stakerPayouts",
-          "astId": 1747,
+          "astId": 1821,
           "type": "t_mapping<t_int256>",
           "src": "730:44:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "totalDistributions",
-          "astId": 1749,
+          "astId": 1823,
           "type": "t_uint256",
           "src": "785:30:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "totalStaked",
-          "astId": 1751,
+          "astId": 1825,
           "type": "t_uint256",
           "src": "822:23:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "totalStakers",
-          "astId": 1753,
+          "astId": 1827,
           "type": "t_uint256",
           "src": "852:24:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "profitPerShare",
-          "astId": 1755,
+          "astId": 1829,
           "type": "t_uint256",
           "src": "883:26:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "emptyStakeTokens",
-          "astId": 1757,
+          "astId": 1831,
           "type": "t_uint256",
           "src": "916:29:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "stakeHandlers",
-          "astId": 1760,
+          "astId": 1834,
           "type": "t_array:dyn<t_address>",
           "src": "1022:36:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "startTime",
-          "astId": 1762,
+          "astId": 1836,
           "type": "t_uint256",
           "src": "1065:21:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "registrationFeeWithReferrer",
-          "astId": 1764,
+          "astId": 1838,
           "type": "t_uint256",
           "src": "1095:39:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "registrationFeeWithoutReferrer",
-          "astId": 1766,
+          "astId": 1840,
           "type": "t_uint256",
           "src": "1141:42:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "accountReferrals",
-          "astId": 1770,
+          "astId": 1844,
           "type": "t_mapping<t_uint256>",
           "src": "1190:48:4"
         },
         {
           "contract": "LidStaking",
-          "path": "..\\..\\D\\LID\\lid-contracts\\contracts\\LidStaking.sol",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
           "label": "stakerIsRegistered",
-          "astId": 1774,
+          "astId": 1848,
           "type": "t_mapping<t_bool>",
           "src": "1245:50:4"
+        },
+        {
+          "contract": "LidStaking",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+          "label": "initialized",
+          "astId": 1886,
+          "type": "t_bool",
+          "src": "1598:24:4"
+        },
+        {
+          "contract": "LidStaking",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+          "label": "stakeValueHistory",
+          "astId": 1896,
+          "type": "t_mapping<t_array:dyn<t_struct<LidStaking.Checkpoint>>>",
+          "src": "1713:59:4"
+        },
+        {
+          "contract": "LidStaking",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+          "label": "totalStakedHistory",
+          "astId": 1899,
+          "type": "t_array:dyn<t_struct<LidStaking.Checkpoint>>",
+          "src": "1781:40:4"
         }
       ],
       "warnings": {
@@ -1582,8 +1643,62 @@
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
         "uninitializedBaseContracts": [],
-        "storageUncheckedVars": [],
-        "storageDiff": []
+        "storageUncheckedVars": [
+          {
+            "contract": "LidStaking",
+            "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+            "label": "stakeValueHistory",
+            "astId": 1896,
+            "type": "t_mapping<t_array:dyn<t_struct<LidStaking.Checkpoint>>>",
+            "src": "1713:59:4"
+          },
+          {
+            "contract": "LidStaking",
+            "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+            "label": "totalStakedHistory",
+            "astId": 1899,
+            "type": "t_array:dyn<t_struct<LidStaking.Checkpoint>>",
+            "src": "1781:40:4"
+          }
+        ],
+        "storageDiff": [
+          {
+            "action": "append",
+            "updated": {
+              "index": 21,
+              "contract": "LidStaking",
+              "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+              "label": "initialized",
+              "astId": 1886,
+              "type": "t_bool",
+              "src": "1598:24:4"
+            }
+          },
+          {
+            "action": "append",
+            "updated": {
+              "index": 22,
+              "contract": "LidStaking",
+              "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+              "label": "stakeValueHistory",
+              "astId": 1896,
+              "type": "t_mapping<t_array:dyn<t_struct<LidStaking.Checkpoint>>>",
+              "src": "1713:59:4"
+            }
+          },
+          {
+            "action": "append",
+            "updated": {
+              "index": 23,
+              "contract": "LidStaking",
+              "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidStaking.sol",
+              "label": "totalStakedHistory",
+              "astId": 1899,
+              "type": "t_array:dyn<t_struct<LidStaking.Checkpoint>>",
+              "src": "1781:40:4"
+            }
+          }
+        ]
       }
     },
     "LidCertifiedPresaleTimer": {
@@ -1689,6 +1804,86 @@
         "hasInitialValuesInDeclarations": false,
         "uninitializedBaseContracts": []
       }
+    },
+    "LidVotingRights": {
+      "address": "0x046a1a762ee1EAe76e88D46dffF2f1A769cd272B",
+      "constructorCode": "608060405234801561001057600080fd5b506106ca806100206000396000f3fe",
+      "bodyBytecodeHash": "ea892a981123ce4fb8a573dd54a42a0ef88c26f54c2f4866b5409c3f47bdb8f2",
+      "localBytecodeHash": "6e16a3c5b606e4690abebc0c995ed4ed8f305e102de263950bb2df3a64748c54",
+      "deployedBytecodeHash": "6e16a3c5b606e4690abebc0c995ed4ed8f305e102de263950bb2df3a64748c54",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
+          "label": "initialized",
+          "astId": 9931,
+          "type": "t_bool",
+          "src": "757:24:41"
+        },
+        {
+          "contract": "Initializable",
+          "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
+          "label": "initializing",
+          "astId": 9933,
+          "type": "t_bool",
+          "src": "876:25:41"
+        },
+        {
+          "contract": "Initializable",
+          "path": "@openzeppelin\\upgrades\\contracts\\Initializable.sol",
+          "label": "______gap",
+          "astId": 9995,
+          "type": "t_array:50<t_uint256>",
+          "src": "1982:29:41"
+        },
+        {
+          "contract": "LidVotingRights",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidVotingRights.sol",
+          "label": "lidStaking",
+          "astId": 4459,
+          "type": "t_address",
+          "src": "194:28:8"
+        },
+        {
+          "contract": "LidVotingRights",
+          "path": "..\\..\\..\\..\\C\\Users\\great\\repos\\lid-core\\contracts\\LidVotingRights.sol",
+          "label": "lidToken",
+          "astId": 4461,
+          "type": "t_address",
+          "src": "227:24:8"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
     }
   },
   "solidityLibs": {},
@@ -1724,7 +1919,7 @@
       {
         "address": "0x9a54FE35D41bc7c8F7071aBf0cCD952505e29ceb",
         "version": "1.0.0",
-        "implementation": "0x0dbA21F1e0a7F164a6F4072822F969ad7d4c255D",
+        "implementation": "0xF4f70eE3D8562268c84D49939b6AFC0d45b9692b",
         "admin": "0x893FA3626C92b0f313F81c830798D14F73f900a6",
         "kind": "Upgradeable"
       }
@@ -1761,6 +1956,15 @@
         "address": "0xE42516bb7743cD74d4186d64c914185ee594b5b6",
         "version": "1.0.0",
         "implementation": "0xD2Ac5eBc2Bc61db64daE34DcB277b60Df41899D1",
+        "admin": "0x893FA3626C92b0f313F81c830798D14F73f900a6",
+        "kind": "Upgradeable"
+      }
+    ],
+    "lid-contracts/LidVotingRights": [
+      {
+        "address": "0xb271e47E8AbD99df2f6275793eF838B0Ee0866c9",
+        "version": "1.0.0",
+        "implementation": "0x046a1a762ee1EAe76e88D46dffF2f1A769cd272B",
         "admin": "0x893FA3626C92b0f313F81c830798D14F73f900a6",
         "kind": "Upgradeable"
       }

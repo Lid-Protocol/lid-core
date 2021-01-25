@@ -8,7 +8,8 @@
     "LidPromoFund": "LidPromoFund",
     "LidDaoLock": "LidDaoLock",
     "LidCertifiedPresaleTimer": "LidCertifiedPresaleTimer",
-    "LidCertifiedPresale": "LidCertifiedPresale"
+    "LidCertifiedPresale": "LidCertifiedPresale",
+    "LidVotingRights": "LidVotingRights"
   },
   "dependencies": {},
   "name": "lid-contracts",
