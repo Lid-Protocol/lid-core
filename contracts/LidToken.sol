@@ -93,7 +93,7 @@ contract LidToken is
         uint256 minWadExpected
     ) external onlyOwner {
         isTaxActive = false;
-        uint256 lidLiqWad = balanceOf(pair).sub(1 ether);
+        uint256 lidLiqWad = _balances[pair].sub(1 ether);
         _balances[pair] = _balances[pair].sub(lidLiqWad);
         _balances[address(this)] = _balances[address(this)].add(lidLiqWad);
         approve(router, lidLiqWad);
