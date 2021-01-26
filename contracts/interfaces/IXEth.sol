@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity =0.6.6;
+pragma solidity =0.5.16;
+
 // Copyright (C) udev 2020
 
-import "@uniswap/v2-core/contracts/interfaces/IERC20.sol";
-
-interface IXEth is IERC20 {
+interface IXEth {
     function deposit() external payable;
 
     function xlockerMint(uint256 wad, address dst) external;
@@ -23,7 +22,28 @@ interface IXEth is IERC20 {
 
     function nonces(address owner) external view returns (uint256);
 
-    event Deposit(address indexed dst, uint256 wad);
-    event Withdrawal(address indexed src, uint256 wad);
-    event XlockerMint(uint256 wad, address dst);
+    function name() external view returns (string memory);
+
+    function symbol() external view returns (string memory);
+
+    function decimals() external view returns (uint8);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address owner) external view returns (uint256);
+
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    function approve(address spender, uint256 value) external returns (bool);
+
+    function transfer(address to, uint256 value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external returns (bool);
 }

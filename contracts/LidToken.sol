@@ -93,20 +93,21 @@ contract LidToken is
         uint256 minWadExpected
     ) external onlyOwner {
         isTaxActive = false;
-        uint256 lidLiqWad = _balances[pair].sub(1 ether);
-        _balances[pair] = _balances[pair].sub(lidLiqWad);
-        _balances[address(this)] = _balances[address(this)].add(lidLiqWad);
-        approve(router, lidLiqWad);
+        uint256 lidLiqWad = balanceOf(pair).sub(1 ether);
+        _transfer(pair, address(lidStaking), lidLiqWad);
+        approve(address(router), lidLiqWad);
+        address[] memory path = new address[](2);
+        path[0] = address(this);
+        path[1] = router.WETH();
         router.swapExactTokensForETH(
             lidLiqWad,
             minWadExpected,
-            [address(this)],
+            path,
             address(this),
             now
         );
-        _balances[pair] = _balances[pair].sub(lidLiqWad);
-        _balances[address(this)] = _balances[address(this)].add(lidLiqWad);
-        xeth.wrap.value(address(this).balance)();
+        _transfer(pair, address(lidStaking), lidLiqWad);
+        xeth.deposit.value(address(this).balance)();
         require(
             xeth.balanceOf(address(this)) >= minWadExpected,
             "Less xeth than expected."
