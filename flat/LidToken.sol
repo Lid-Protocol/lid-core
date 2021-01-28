@@ -1,6 +1,5 @@
 pragma solidity 0.5.16;
 
-
 /**
  * @title Initializable
  *
@@ -14,53 +13,56 @@ pragma solidity 0.5.16;
  * because this is not dealt with automatically as with constructors.
  */
 contract Initializable {
+    /**
+     * @dev Indicates that the contract has been initialized.
+     */
+    bool private initialized;
 
-  /**
-   * @dev Indicates that the contract has been initialized.
-   */
-  bool private initialized;
+    /**
+     * @dev Indicates that the contract is in the process of being initialized.
+     */
+    bool private initializing;
 
-  /**
-   * @dev Indicates that the contract is in the process of being initialized.
-   */
-  bool private initializing;
+    /**
+     * @dev Modifier to use in the initializer function of a contract.
+     */
+    modifier initializer() {
+        require(
+            initializing || isConstructor() || !initialized,
+            "Contract instance has already been initialized"
+        );
 
-  /**
-   * @dev Modifier to use in the initializer function of a contract.
-   */
-  modifier initializer() {
-    require(initializing || isConstructor() || !initialized, "Contract instance has already been initialized");
+        bool isTopLevelCall = !initializing;
+        if (isTopLevelCall) {
+            initializing = true;
+            initialized = true;
+        }
 
-    bool isTopLevelCall = !initializing;
-    if (isTopLevelCall) {
-      initializing = true;
-      initialized = true;
+        _;
+
+        if (isTopLevelCall) {
+            initializing = false;
+        }
     }
 
-    _;
-
-    if (isTopLevelCall) {
-      initializing = false;
+    /// @dev Returns true if and only if the function is running in the constructor
+    function isConstructor() private view returns (bool) {
+        // extcodesize checks the size of the code stored in an address, and
+        // address returns the current address. Since the code is still not
+        // deployed when running a constructor, any checks on its code size will
+        // yield zero, making it an effective way to detect if a contract is
+        // under construction or not.
+        address self = address(this);
+        uint256 cs;
+        assembly {
+            cs := extcodesize(self)
+        }
+        return cs == 0;
     }
-  }
 
-  /// @dev Returns true if and only if the function is running in the constructor
-  function isConstructor() private view returns (bool) {
-    // extcodesize checks the size of the code stored in an address, and
-    // address returns the current address. Since the code is still not
-    // deployed when running a constructor, any checks on its code size will
-    // yield zero, making it an effective way to detect if a contract is
-    // under construction or not.
-    address self = address(this);
-    uint256 cs;
-    assembly { cs := extcodesize(self) }
-    return cs == 0;
-  }
-
-  // Reserved storage space to allow for layout changes in the future.
-  uint256[50] private ______gap;
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private ______gap;
 }
-
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -75,7 +77,8 @@ contract Initializable {
 contract Context is Initializable {
     // Empty internal constructor, to prevent people from mistakenly deploying
     // an instance of this contract, which should be used via inheritance.
-    constructor () internal { }
+    constructor() internal {}
+
     // solhint-disable-previous-line no-empty-blocks
 
     function _msgSender() internal view returns (address payable) {
@@ -87,7 +90,6 @@ contract Context is Initializable {
         return msg.data;
     }
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -111,7 +113,9 @@ interface IERC20 {
      *
      * Emits a {Transfer} event.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool);
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
 
     /**
      * @dev Returns the remaining number of tokens that `spender` will be
@@ -120,7 +124,10 @@ interface IERC20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(address owner, address spender) external view returns (uint256);
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -147,7 +154,11 @@ interface IERC20 {
      *
      * Emits a {Transfer} event.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
 
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -161,9 +172,12 @@ interface IERC20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
-
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -219,7 +233,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function sub(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         require(b <= a, errorMessage);
         uint256 c = a - b;
 
@@ -277,7 +295,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function div(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         // Solidity only automatically asserts when dividing by 0
         require(b > 0, errorMessage);
         uint256 c = a / b;
@@ -314,12 +336,15 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function mod(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         require(b != 0, errorMessage);
         return a % b;
     }
 }
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -348,9 +373,9 @@ library SafeMath {
 contract ERC20 is Initializable, Context, IERC20 {
     using SafeMath for uint256;
 
-    mapping (address => uint256) private _balances;
+    mapping(address => uint256) private _balances;
 
-    mapping (address => mapping (address => uint256)) private _allowances;
+    mapping(address => mapping(address => uint256)) private _allowances;
 
     uint256 private _totalSupply;
 
@@ -384,7 +409,11 @@ contract ERC20 is Initializable, Context, IERC20 {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(address owner, address spender) public view returns (uint256) {
+    function allowance(address owner, address spender)
+        public
+        view
+        returns (uint256)
+    {
         return _allowances[owner][spender];
     }
 
@@ -412,9 +441,20 @@ contract ERC20 is Initializable, Context, IERC20 {
      * - the caller must have allowance for `sender`'s tokens of at least
      * `amount`.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(
+            sender,
+            _msgSender(),
+            _allowances[sender][_msgSender()].sub(
+                amount,
+                "ERC20: transfer amount exceeds allowance"
+            )
+        );
         return true;
     }
 
@@ -430,8 +470,15 @@ contract ERC20 is Initializable, Context, IERC20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+    function increaseAllowance(address spender, uint256 addedValue)
+        public
+        returns (bool)
+    {
+        _approve(
+            _msgSender(),
+            spender,
+            _allowances[_msgSender()][spender].add(addedValue)
+        );
         return true;
     }
 
@@ -449,8 +496,18 @@ contract ERC20 is Initializable, Context, IERC20 {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        public
+        returns (bool)
+    {
+        _approve(
+            _msgSender(),
+            spender,
+            _allowances[_msgSender()][spender].sub(
+                subtractedValue,
+                "ERC20: decreased allowance below zero"
+            )
+        );
         return true;
     }
 
@@ -468,11 +525,18 @@ contract ERC20 is Initializable, Context, IERC20 {
      * - `recipient` cannot be the zero address.
      * - `sender` must have a balance of at least `amount`.
      */
-    function _transfer(address sender, address recipient, uint256 amount) internal {
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
+        _balances[sender] = _balances[sender].sub(
+            amount,
+            "ERC20: transfer amount exceeds balance"
+        );
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
@@ -508,7 +572,10 @@ contract ERC20 is Initializable, Context, IERC20 {
     function _burn(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: burn from the zero address");
 
-        _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
+        _balances[account] = _balances[account].sub(
+            amount,
+            "ERC20: burn amount exceeds balance"
+        );
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
@@ -526,7 +593,11 @@ contract ERC20 is Initializable, Context, IERC20 {
      * - `owner` cannot be the zero address.
      * - `spender` cannot be the zero address.
      */
-    function _approve(address owner, address spender, uint256 amount) internal {
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
@@ -542,12 +613,18 @@ contract ERC20 is Initializable, Context, IERC20 {
      */
     function _burnFrom(address account, uint256 amount) internal {
         _burn(account, amount);
-        _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "ERC20: burn amount exceeds allowance"));
+        _approve(
+            account,
+            _msgSender(),
+            _allowances[account][_msgSender()].sub(
+                amount,
+                "ERC20: burn amount exceeds allowance"
+            )
+        );
     }
 
     uint256[50] private ______gap;
 }
-
 
 /**
  * @dev Extension of {ERC20} that allows token holders to destroy both their own
@@ -574,7 +651,6 @@ contract ERC20Burnable is Initializable, Context, ERC20 {
     uint256[50] private ______gap;
 }
 
-
 /**
  * @dev Optional functions from the ERC20 standard.
  */
@@ -588,7 +664,11 @@ contract ERC20Detailed is Initializable, IERC20 {
      * these values are immutable: they can only be set once during
      * construction.
      */
-    function initialize(string memory name, string memory symbol, uint8 decimals) public initializer {
+    function initialize(
+        string memory name,
+        string memory symbol,
+        uint8 decimals
+    ) public initializer {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
@@ -628,14 +708,13 @@ contract ERC20Detailed is Initializable, IERC20 {
     uint256[50] private ______gap;
 }
 
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
  */
 library Roles {
     struct Role {
-        mapping (address => bool) bearer;
+        mapping(address => bool) bearer;
     }
 
     /**
@@ -658,12 +737,15 @@ library Roles {
      * @dev Check if an account has this role.
      * @return bool
      */
-    function has(Role storage role, address account) internal view returns (bool) {
+    function has(Role storage role, address account)
+        internal
+        view
+        returns (bool)
+    {
         require(account != address(0), "Roles: account is the zero address");
         return role.bearer[account];
     }
 }
-
 
 contract MinterRole is Initializable, Context {
     using Roles for Roles.Role;
@@ -680,7 +762,10 @@ contract MinterRole is Initializable, Context {
     }
 
     modifier onlyMinter() {
-        require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
+        require(
+            isMinter(_msgSender()),
+            "MinterRole: caller does not have the Minter role"
+        );
         _;
     }
 
@@ -709,7 +794,6 @@ contract MinterRole is Initializable, Context {
     uint256[50] private ______gap;
 }
 
-
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -728,14 +812,17 @@ contract ERC20Mintable is Initializable, ERC20, MinterRole {
      *
      * - the caller must have the {MinterRole}.
      */
-    function mint(address account, uint256 amount) public onlyMinter returns (bool) {
+    function mint(address account, uint256 amount)
+        public
+        onlyMinter
+        returns (bool)
+    {
         _mint(account, amount);
         return true;
     }
 
     uint256[50] private ______gap;
 }
-
 
 contract PauserRole is Initializable, Context {
     using Roles for Roles.Role;
@@ -752,7 +839,10 @@ contract PauserRole is Initializable, Context {
     }
 
     modifier onlyPauser() {
-        require(isPauser(_msgSender()), "PauserRole: caller does not have the Pauser role");
+        require(
+            isPauser(_msgSender()),
+            "PauserRole: caller does not have the Pauser role"
+        );
         _;
     }
 
@@ -780,7 +870,6 @@ contract PauserRole is Initializable, Context {
 
     uint256[50] private ______gap;
 }
-
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -856,7 +945,6 @@ contract Pausable is Initializable, Context, PauserRole {
     uint256[50] private ______gap;
 }
 
-
 /**
  * @title Pausable token
  * @dev ERC20 with pausable transfers and allowances.
@@ -870,29 +958,48 @@ contract ERC20Pausable is Initializable, ERC20, Pausable {
         Pausable.initialize(sender);
     }
 
-    function transfer(address to, uint256 value) public whenNotPaused returns (bool) {
+    function transfer(address to, uint256 value)
+        public
+        whenNotPaused
+        returns (bool)
+    {
         return super.transfer(to, value);
     }
 
-    function transferFrom(address from, address to, uint256 value) public whenNotPaused returns (bool) {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) public whenNotPaused returns (bool) {
         return super.transferFrom(from, to, value);
     }
 
-    function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
+    function approve(address spender, uint256 value)
+        public
+        whenNotPaused
+        returns (bool)
+    {
         return super.approve(spender, value);
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) public whenNotPaused returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue)
+        public
+        whenNotPaused
+        returns (bool)
+    {
         return super.increaseAllowance(spender, addedValue);
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        public
+        whenNotPaused
+        returns (bool)
+    {
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
     uint256[50] private ______gap;
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -906,7 +1013,10 @@ contract ERC20Pausable is Initializable, ERC20, Pausable {
 contract Ownable is Initializable, Context {
     address private _owner;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -962,7 +1072,10 @@ contract Ownable is Initializable, Context {
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
      */
     function _transferOwnership(address newOwner) internal {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
         emit OwnershipTransferred(_owner, newOwner);
         _owner = newOwner;
     }
@@ -970,98 +1083,129 @@ contract Ownable is Initializable, Context {
     uint256[50] private ______gap;
 }
 
-
 library BasisPoints {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
-    uint constant private BASIS_POINTS = 10000;
+    uint256 private constant BASIS_POINTS = 10000;
 
-    function mulBP(uint amt, uint bp) internal pure returns (uint) {
+    function mulBP(uint256 amt, uint256 bp) internal pure returns (uint256) {
         if (amt == 0) return 0;
         return amt.mul(bp).div(BASIS_POINTS);
     }
 
-    function divBP(uint amt, uint bp) internal pure returns (uint) {
+    function divBP(uint256 amt, uint256 bp) internal pure returns (uint256) {
         require(bp > 0, "Cannot divide by zero.");
         if (amt == 0) return 0;
         return amt.mul(BASIS_POINTS).div(bp);
     }
 
-    function addBP(uint amt, uint bp) internal pure returns (uint) {
+    function addBP(uint256 amt, uint256 bp) internal pure returns (uint256) {
         if (amt == 0) return 0;
         if (bp == 0) return amt;
         return amt.add(mulBP(amt, bp));
     }
 
-    function subBP(uint amt, uint bp) internal pure returns (uint) {
+    function subBP(uint256 amt, uint256 bp) internal pure returns (uint256) {
         if (amt == 0) return 0;
         if (bp == 0) return amt;
         return amt.sub(mulBP(amt, bp));
     }
 }
 
-
 interface ILidCertifiableToken {
     function activateTransfers() external;
+
     function activateTax() external;
+
     function mint(address account, uint256 amount) external returns (bool);
+
     function addMinter(address account) external;
+
     function renounceMinter() external;
-    function transfer(address recipient, uint256 amount) external returns (bool);
+
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
+
     function approve(address spender, uint256 amount) external returns (bool);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint256);
+
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
     function isMinter(address account) external view returns (bool);
+
     function totalSupply() external view returns (uint256);
+
     function balanceOf(address account) external view returns (uint256);
+
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
-
 
 interface IStakeHandler {
-    function handleStake(address staker, uint stakerDeltaValue, uint stakerFinalValue) external;
-    function handleUnstake(address staker, uint stakerDeltaValue, uint stakerFinalValue) external;
+    function handleStake(
+        address staker,
+        uint256 stakerDeltaValue,
+        uint256 stakerFinalValue
+    ) external;
+
+    function handleUnstake(
+        address staker,
+        uint256 stakerDeltaValue,
+        uint256 stakerFinalValue
+    ) external;
 }
 
-
 contract LidStaking is Initializable, Ownable {
-    using BasisPoints for uint;
-    using SafeMath for uint;
+    using BasisPoints for uint256;
+    using SafeMath for uint256;
 
-    uint256 constant internal DISTRIBUTION_MULTIPLIER = 2 ** 64;
+    uint256 internal constant DISTRIBUTION_MULTIPLIER = 2**64;
 
-    uint public stakingTaxBP;
-    uint public unstakingTaxBP;
+    uint256 public stakingTaxBP;
+    uint256 public unstakingTaxBP;
     ILidCertifiableToken private lidToken;
 
-    mapping(address => uint) public stakeValue;
-    mapping(address => int) public stakerPayouts;
+    mapping(address => uint256) public stakeValue;
+    mapping(address => int256) public stakerPayouts;
 
-
-    uint public totalDistributions;
-    uint public totalStaked;
-    uint public totalStakers;
-    uint public profitPerShare;
-    uint private emptyStakeTokens; //These are tokens given to the contract when there are no stakers.
+    uint256 public totalDistributions;
+    uint256 public totalStaked;
+    uint256 public totalStakers;
+    uint256 public profitPerShare;
+    uint256 private emptyStakeTokens; //These are tokens given to the contract when there are no stakers.
 
     IStakeHandler[] public stakeHandlers;
-    uint public startTime;
+    uint256 public startTime;
 
-    uint public registrationFeeWithReferrer;
-    uint public registrationFeeWithoutReferrer;
-    mapping(address => uint) public accountReferrals;
+    uint256 public registrationFeeWithReferrer;
+    uint256 public registrationFeeWithoutReferrer;
+    mapping(address => uint256) public accountReferrals;
     mapping(address => bool) public stakerIsRegistered;
 
-    event OnDistribute(address sender, uint amountSent);
-    event OnStake(address sender, uint amount, uint tax);
-    event OnUnstake(address sender, uint amount, uint tax);
-    event OnReinvest(address sender, uint amount, uint tax);
-    event OnWithdraw(address sender, uint amount);
+    event OnDistribute(address sender, uint256 amountSent);
+    event OnStake(address sender, uint256 amount, uint256 tax);
+    event OnUnstake(address sender, uint256 amount, uint256 tax);
+    event OnReinvest(address sender, uint256 amount, uint256 tax);
+    event OnWithdraw(address sender, uint256 amount);
 
     modifier onlyLidToken {
-        require(msg.sender == address(lidToken), "Can only be called by LidToken contract.");
+        require(
+            msg.sender == address(lidToken),
+            "Can only be called by LidToken contract."
+        );
         _;
     }
 
@@ -1071,10 +1215,10 @@ contract LidStaking is Initializable, Ownable {
     }
 
     function initialize(
-        uint _stakingTaxBP,
-        uint _ustakingTaxBP,
-        uint _registrationFeeWithReferrer,
-        uint _registrationFeeWithoutReferrer,
+        uint256 _stakingTaxBP,
+        uint256 _ustakingTaxBP,
+        uint256 _registrationFeeWithReferrer,
+        uint256 _registrationFeeWithoutReferrer,
         address owner,
         ILidCertifiableToken _lidToken
     ) external initializer {
@@ -1088,23 +1232,45 @@ contract LidStaking is Initializable, Ownable {
         _transferOwnership(owner);
     }
 
-    function registerAndStake(uint amount) public {
+    function registerAndStake(uint256 amount) public {
         registerAndStake(amount, address(0x0));
     }
 
-    function registerAndStake(uint amount, address referrer) public whenStakingActive {
-        require(!stakerIsRegistered[msg.sender], "Staker must not be registered");
-        require(lidToken.balanceOf(msg.sender) >= amount, "Must have enough balance to stake amount");
-        uint finalAmount;
-        if(address(0x0) == referrer) {
+    function registerAndStake(uint256 amount, address referrer)
+        public
+        whenStakingActive
+    {
+        require(
+            !stakerIsRegistered[msg.sender],
+            "Staker must not be registered"
+        );
+        require(
+            lidToken.balanceOf(msg.sender) >= amount,
+            "Must have enough balance to stake amount"
+        );
+        uint256 finalAmount;
+        if (address(0x0) == referrer) {
             //No referrer
-            require(amount >= registrationFeeWithoutReferrer, "Must send at least enough LID to pay registration fee.");
+            require(
+                amount >= registrationFeeWithoutReferrer,
+                "Must send at least enough LID to pay registration fee."
+            );
             distribute(registrationFeeWithoutReferrer);
             finalAmount = amount.sub(registrationFeeWithoutReferrer);
         } else {
             //has referrer
-            require(amount >= registrationFeeWithReferrer, "Must send at least enough LID to pay registration fee.");
-            require(lidToken.transferFrom(msg.sender, referrer, registrationFeeWithReferrer), "Stake failed due to failed referral transfer.");
+            require(
+                amount >= registrationFeeWithReferrer,
+                "Must send at least enough LID to pay registration fee."
+            );
+            require(
+                lidToken.transferFrom(
+                    msg.sender,
+                    referrer,
+                    registrationFeeWithReferrer
+                ),
+                "Stake failed due to failed referral transfer."
+            );
             accountReferrals[referrer] = accountReferrals[referrer].add(1);
             finalAmount = amount.sub(registrationFeeWithReferrer);
         }
@@ -1112,51 +1278,87 @@ contract LidStaking is Initializable, Ownable {
         stake(finalAmount);
     }
 
-    function stake(uint amount) public whenStakingActive {
-        require(stakerIsRegistered[msg.sender] == true, "Must be registered to stake.");
+    function stake(uint256 amount) public whenStakingActive {
+        require(
+            stakerIsRegistered[msg.sender] == true,
+            "Must be registered to stake."
+        );
         require(amount >= 1e18, "Must stake at least one LID.");
-        require(lidToken.balanceOf(msg.sender) >= amount, "Cannot stake more LID than you hold unstaked.");
+        require(
+            lidToken.balanceOf(msg.sender) >= amount,
+            "Cannot stake more LID than you hold unstaked."
+        );
         if (stakeValue[msg.sender] == 0) totalStakers = totalStakers.add(1);
-        uint tax = _addStake(amount);
-        require(lidToken.transferFrom(msg.sender, address(this), amount), "Stake failed due to failed transfer.");
+        uint256 tax = _addStake(amount);
+        require(
+            lidToken.transferFrom(msg.sender, address(this), amount),
+            "Stake failed due to failed transfer."
+        );
         emit OnStake(msg.sender, amount, tax);
     }
 
-    function unstake(uint amount) external whenStakingActive {
+    function unstake(uint256 amount) external whenStakingActive {
         require(amount >= 1e18, "Must unstake at least one LID.");
-        require(stakeValue[msg.sender] >= amount, "Cannot unstake more LID than you have staked.");
-        uint tax = findTaxAmount(amount, unstakingTaxBP);
-        uint earnings = amount.sub(tax);
-        if (stakeValue[msg.sender] == amount) totalStakers = totalStakers.sub(1);
+        require(
+            stakeValue[msg.sender] >= amount,
+            "Cannot unstake more LID than you have staked."
+        );
+        uint256 tax = findTaxAmount(amount, unstakingTaxBP);
+        uint256 earnings = amount.sub(tax);
+        if (stakeValue[msg.sender] == amount)
+            totalStakers = totalStakers.sub(1);
         totalStaked = totalStaked.sub(amount);
         stakeValue[msg.sender] = stakeValue[msg.sender].sub(amount);
-        uint payout = profitPerShare.mul(amount).add(tax.mul(DISTRIBUTION_MULTIPLIER));
-        stakerPayouts[msg.sender] = stakerPayouts[msg.sender] - uintToInt(payout);
-        for (uint i=0; i < stakeHandlers.length; i++) {
-            stakeHandlers[i].handleUnstake(msg.sender, amount, stakeValue[msg.sender]);
+        uint256 payout =
+            profitPerShare.mul(amount).add(tax.mul(DISTRIBUTION_MULTIPLIER));
+        stakerPayouts[msg.sender] =
+            stakerPayouts[msg.sender] -
+            uintToInt(payout);
+        for (uint256 i = 0; i < stakeHandlers.length; i++) {
+            stakeHandlers[i].handleUnstake(
+                msg.sender,
+                amount,
+                stakeValue[msg.sender]
+            );
         }
         _increaseProfitPerShare(tax);
-        require(lidToken.transferFrom(address(this), msg.sender, earnings), "Unstake failed due to failed transfer.");
+        require(
+            lidToken.transferFrom(address(this), msg.sender, earnings),
+            "Unstake failed due to failed transfer."
+        );
         emit OnUnstake(msg.sender, amount, tax);
     }
 
-    function withdraw(uint amount) external whenStakingActive {
-        require(dividendsOf(msg.sender) >= amount, "Cannot withdraw more dividends than you have earned.");
-        stakerPayouts[msg.sender] = stakerPayouts[msg.sender] + uintToInt(amount.mul(DISTRIBUTION_MULTIPLIER));
+    function withdraw(uint256 amount) external whenStakingActive {
+        require(
+            dividendsOf(msg.sender) >= amount,
+            "Cannot withdraw more dividends than you have earned."
+        );
+        stakerPayouts[msg.sender] =
+            stakerPayouts[msg.sender] +
+            uintToInt(amount.mul(DISTRIBUTION_MULTIPLIER));
         lidToken.transfer(msg.sender, amount);
         emit OnWithdraw(msg.sender, amount);
     }
 
-    function reinvest(uint amount) external whenStakingActive {
-        require(dividendsOf(msg.sender) >= amount, "Cannot reinvest more dividends than you have earned.");
-        uint payout = amount.mul(DISTRIBUTION_MULTIPLIER);
-        stakerPayouts[msg.sender] = stakerPayouts[msg.sender] + uintToInt(payout);
-        uint tax = _addStake(amount);
+    function reinvest(uint256 amount) external whenStakingActive {
+        require(
+            dividendsOf(msg.sender) >= amount,
+            "Cannot reinvest more dividends than you have earned."
+        );
+        uint256 payout = amount.mul(DISTRIBUTION_MULTIPLIER);
+        stakerPayouts[msg.sender] =
+            stakerPayouts[msg.sender] +
+            uintToInt(payout);
+        uint256 tax = _addStake(amount);
         emit OnReinvest(msg.sender, amount, tax);
     }
 
-    function distribute(uint amount) public {
-        require(lidToken.balanceOf(msg.sender) >= amount, "Cannot distribute more LID than you hold unstaked.");
+    function distribute(uint256 amount) public {
+        require(
+            lidToken.balanceOf(msg.sender) >= amount,
+            "Cannot distribute more LID than you hold unstaked."
+        );
         totalDistributions = totalDistributions.add(amount);
         _increaseProfitPerShare(amount);
         require(
@@ -1166,22 +1368,30 @@ contract LidStaking is Initializable, Ownable {
         emit OnDistribute(msg.sender, amount);
     }
 
-    function handleTaxDistribution(uint amount) external onlyLidToken {
+    function handleTaxDistribution(uint256 amount) external onlyLidToken {
         totalDistributions = totalDistributions.add(amount);
         _increaseProfitPerShare(amount);
         emit OnDistribute(msg.sender, amount);
     }
 
-    function dividendsOf(address staker) public view returns (uint) {
-        return uint(uintToInt(profitPerShare.mul(stakeValue[staker])) - stakerPayouts[staker])
-            .div(DISTRIBUTION_MULTIPLIER);
+    function dividendsOf(address staker) public view returns (uint256) {
+        return
+            uint256(
+                uintToInt(profitPerShare.mul(stakeValue[staker])) -
+                    stakerPayouts[staker]
+            )
+                .div(DISTRIBUTION_MULTIPLIER);
     }
 
-    function findTaxAmount(uint value, uint taxBP) public pure returns (uint) {
+    function findTaxAmount(uint256 value, uint256 taxBP)
+        public
+        pure
+        returns (uint256)
+    {
         return value.mulBP(taxBP);
     }
 
-    function numberStakeHandlersRegistered() external view returns (uint) {
+    function numberStakeHandlersRegistered() external view returns (uint256) {
         return stakeHandlers.length;
     }
 
@@ -1189,66 +1399,75 @@ contract LidStaking is Initializable, Ownable {
         stakeHandlers.push(sc);
     }
 
-    function unregisterStakeHandler(uint index) external onlyOwner {
-        IStakeHandler sc = stakeHandlers[stakeHandlers.length-1];
+    function unregisterStakeHandler(uint256 index) external onlyOwner {
+        IStakeHandler sc = stakeHandlers[stakeHandlers.length - 1];
         stakeHandlers.pop();
         stakeHandlers[index] = sc;
     }
 
-    function setStakingBP(uint valueBP) external onlyOwner {
+    function setStakingBP(uint256 valueBP) external onlyOwner {
         require(valueBP < 10000, "Tax connot be over 100% (10000 BP)");
         stakingTaxBP = valueBP;
     }
 
-    function setUnstakingBP(uint valueBP) external onlyOwner {
+    function setUnstakingBP(uint256 valueBP) external onlyOwner {
         require(valueBP < 10000, "Tax connot be over 100% (10000 BP)");
         unstakingTaxBP = valueBP;
     }
 
-    function setStartTime(uint _startTime) external onlyOwner {
+    function setStartTime(uint256 _startTime) external onlyOwner {
         startTime = _startTime;
     }
 
-    function setRegistrationFees(uint valueWithReferrer, uint valueWithoutReferrer) external onlyOwner {
+    function setRegistrationFees(
+        uint256 valueWithReferrer,
+        uint256 valueWithoutReferrer
+    ) external onlyOwner {
         registrationFeeWithReferrer = valueWithReferrer;
         registrationFeeWithoutReferrer = valueWithoutReferrer;
     }
 
-    function uintToInt(uint val) internal pure returns (int) {
-        if (val >= uint(-1).div(2)) {
+    function uintToInt(uint256 val) internal pure returns (int256) {
+        if (val >= uint256(-1).div(2)) {
             require(false, "Overflow. Cannot convert uint to int.");
         } else {
-            return int(val);
+            return int256(val);
         }
     }
 
-    function _addStake(uint amount) internal returns (uint tax) {
+    function _addStake(uint256 amount) internal returns (uint256 tax) {
         tax = findTaxAmount(amount, stakingTaxBP);
-        uint stakeAmount = amount.sub(tax);
+        uint256 stakeAmount = amount.sub(tax);
         totalStaked = totalStaked.add(stakeAmount);
         stakeValue[msg.sender] = stakeValue[msg.sender].add(stakeAmount);
-        for (uint i=0; i < stakeHandlers.length; i++) {
-            stakeHandlers[i].handleStake(msg.sender, stakeAmount, stakeValue[msg.sender]);
+        for (uint256 i = 0; i < stakeHandlers.length; i++) {
+            stakeHandlers[i].handleStake(
+                msg.sender,
+                stakeAmount,
+                stakeValue[msg.sender]
+            );
         }
-        uint payout = profitPerShare.mul(stakeAmount);
-        stakerPayouts[msg.sender] = stakerPayouts[msg.sender] + uintToInt(payout);
+        uint256 payout = profitPerShare.mul(stakeAmount);
+        stakerPayouts[msg.sender] =
+            stakerPayouts[msg.sender] +
+            uintToInt(payout);
         _increaseProfitPerShare(tax);
     }
 
-    function _increaseProfitPerShare(uint amount) internal {
+    function _increaseProfitPerShare(uint256 amount) internal {
         if (totalStaked != 0) {
             if (emptyStakeTokens != 0) {
                 amount = amount.add(emptyStakeTokens);
                 emptyStakeTokens = 0;
             }
-            profitPerShare = profitPerShare.add(amount.mul(DISTRIBUTION_MULTIPLIER).div(totalStaked));
+            profitPerShare = profitPerShare.add(
+                amount.mul(DISTRIBUTION_MULTIPLIER).div(totalStaked)
+            );
         } else {
             emptyStakeTokens = emptyStakeTokens.add(amount);
         }
     }
-
 }
-
 
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
@@ -1283,7 +1502,10 @@ contract ReentrancyGuard is Initializable {
         _guardCounter += 1;
         uint256 localCounter = _guardCounter;
         _;
-        require(localCounter == _guardCounter, "ReentrancyGuard: reentrant call");
+        require(
+            localCounter == _guardCounter,
+            "ReentrancyGuard: reentrant call"
+        );
     }
 
     uint256[50] private ______gap;
@@ -1296,110 +1518,173 @@ pragma solidity =0.5.16;
 interface IUniswapV2Router01 {
     function factory() external pure returns (address);
 
-    function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
-    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external pure returns (uint amountIn);
-    function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
-    function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
+    function quote(
+        uint256 amountA,
+        uint256 reserveA,
+        uint256 reserveB
+    ) external pure returns (uint256 amountB);
+
+    function getAmountOut(
+        uint256 amountIn,
+        uint256 reserveIn,
+        uint256 reserveOut
+    ) external pure returns (uint256 amountOut);
+
+    function getAmountIn(
+        uint256 amountOut,
+        uint256 reserveIn,
+        uint256 reserveOut
+    ) external pure returns (uint256 amountIn);
+
+    function getAmountsOut(uint256 amountIn, address[] calldata path)
+        external
+        view
+        returns (uint256[] memory amounts);
+
+    function getAmountsIn(uint256 amountOut, address[] calldata path)
+        external
+        view
+        returns (uint256[] memory amounts);
 
     function WETH() external view returns (address);
 
     function addLiquidity(
         address tokenA,
         address tokenB,
-        uint amountADesired,
-        uint amountBDesired,
-        uint amountAMin,
-        uint amountBMin,
+        uint256 amountADesired,
+        uint256 amountBDesired,
+        uint256 amountAMin,
+        uint256 amountBMin,
         address to,
-        uint deadline
-    ) external returns (uint amountA, uint amountB, uint liquidity);
+        uint256 deadline
+    )
+        external
+        returns (
+            uint256 amountA,
+            uint256 amountB,
+            uint256 liquidity
+        );
+
     function addLiquidityETH(
         address token,
-        uint amountTokenDesired,
-        uint amountTokenMin,
-        uint amountETHMin,
+        uint256 amountTokenDesired,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
         address to,
-        uint deadline
-    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
+        uint256 deadline
+    )
+        external
+        payable
+        returns (
+            uint256 amountToken,
+            uint256 amountETH,
+            uint256 liquidity
+        );
+
     function removeLiquidity(
         address tokenA,
         address tokenB,
-        uint liquidity,
-        uint amountAMin,
-        uint amountBMin,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
         address to,
-        uint deadline
-    ) external returns (uint amountA, uint amountB);
+        uint256 deadline
+    ) external returns (uint256 amountA, uint256 amountB);
+
     function removeLiquidityETH(
         address token,
-        uint liquidity,
-        uint amountTokenMin,
-        uint amountETHMin,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
         address to,
-        uint deadline
-    ) external returns (uint amountToken, uint amountETH);
+        uint256 deadline
+    ) external returns (uint256 amountToken, uint256 amountETH);
+
     function removeLiquidityWithPermit(
         address tokenA,
         address tokenB,
-        uint liquidity,
-        uint amountAMin,
-        uint amountBMin,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
         address to,
-        uint deadline,
-        bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external returns (uint amountA, uint amountB);
+        uint256 deadline,
+        bool approveMax,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external returns (uint256 amountA, uint256 amountB);
+
     function removeLiquidityETHWithPermit(
         address token,
-        uint liquidity,
-        uint amountTokenMin,
-        uint amountETHMin,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
         address to,
-        uint deadline,
-        bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external returns (uint amountToken, uint amountETH);
+        uint256 deadline,
+        bool approveMax,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external returns (uint256 amountToken, uint256 amountETH);
+
     function swapExactTokensForTokens(
-        uint amountIn,
-        uint amountOutMin,
+        uint256 amountIn,
+        uint256 amountOutMin,
         address[] calldata path,
         address to,
-        uint deadline
-    ) external returns (uint[] memory amounts);
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+
     function swapTokensForExactTokens(
-        uint amountOut,
-        uint amountInMax,
+        uint256 amountOut,
+        uint256 amountInMax,
         address[] calldata path,
         address to,
-        uint deadline
-    ) external returns (uint[] memory amounts);
-    function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
-        external
-        payable
-        returns (uint[] memory amounts);
-    function swapTokensForExactETH(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
-        external
-        returns (uint[] memory amounts);
-    function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
-        external
-        returns (uint[] memory amounts);
-    function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
-        external
-        payable
-        returns (uint[] memory amounts);
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+
+    function swapExactETHForTokens(
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable returns (uint256[] memory amounts);
+
+    function swapTokensForExactETH(
+        uint256 amountOut,
+        uint256 amountInMax,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+
+    function swapExactTokensForETH(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+
+    function swapETHForExactTokens(
+        uint256 amountOut,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable returns (uint256[] memory amounts);
 }
 
-
 contract LidCertifiedPresaleTimer is Initializable, Ownable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
-    uint public startTime;
-    uint public baseTimer;
-    uint public deltaTimer;
+    uint256 public startTime;
+    uint256 public baseTimer;
+    uint256 public deltaTimer;
 
     function initialize(
-        uint _startTime,
-        uint _baseTimer,
-        uint _deltaTimer,
+        uint256 _startTime,
+        uint256 _baseTimer,
+        uint256 _deltaTimer,
         address owner
     ) external initializer {
         Ownable.initialize(msg.sender);
@@ -1410,7 +1695,7 @@ contract LidCertifiedPresaleTimer is Initializable, Ownable {
         _transferOwnership(owner);
     }
 
-    function setStartTime(uint time) external onlyOwner {
+    function setStartTime(uint256 time) external onlyOwner {
         startTime = time;
     }
 
@@ -1418,8 +1703,8 @@ contract LidCertifiedPresaleTimer is Initializable, Ownable {
         return (startTime != 0 && now > startTime);
     }
 
-    function getEndTime(uint bal) external view returns (uint) {
-        uint multiplier = 0;
+    function getEndTime(uint256 bal) external view returns (uint256) {
+        uint256 multiplier = 0;
         if (bal <= 1000 ether) {
             multiplier = bal.div(100 ether);
         } else if (bal <= 10000 ether) {
@@ -1433,62 +1718,57 @@ contract LidCertifiedPresaleTimer is Initializable, Ownable {
         } else if (bal <= 100000000 ether) {
             multiplier = bal.div(10000000 ether).add(49);
         }
-        return startTime.add(
-            baseTimer
-        ).add(
-            deltaTimer.mul(multiplier)
-        );
+        return startTime.add(baseTimer).add(deltaTimer.mul(multiplier));
     }
 }
 
-
 contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
-    using BasisPoints for uint;
-    using SafeMath for uint;
+    using BasisPoints for uint256;
+    using SafeMath for uint256;
 
-    uint public maxBuyPerAddressBase;
-    uint public maxBuyPerAddressBP;
-    uint public maxBuyWithoutWhitelisting;
+    uint256 public maxBuyPerAddressBase;
+    uint256 public maxBuyPerAddressBP;
+    uint256 public maxBuyWithoutWhitelisting;
 
-    uint public redeemBP;
-    uint public redeemInterval;
+    uint256 public redeemBP;
+    uint256 public redeemInterval;
 
-    uint public referralBP;
+    uint256 public referralBP;
 
-    uint public uniswapEthBP;
+    uint256 public uniswapEthBP;
     address payable[] public etherPools;
-    uint[] public etherPoolBPs;
+    uint256[] public etherPoolBPs;
 
-    uint public uniswapTokenBP;
-    uint public presaleTokenBP;
+    uint256 public uniswapTokenBP;
+    uint256 public presaleTokenBP;
     address[] public tokenPools;
-    uint[] public tokenPoolBPs;
+    uint256[] public tokenPoolBPs;
 
-    uint public startingPrice;
-    uint public multiplierPrice;
+    uint256 public startingPrice;
+    uint256 public multiplierPrice;
 
     bool public hasSentToUniswap;
     bool public hasIssuedTokens;
     bool public hasSentEther;
 
-    uint public totalTokens;
-    uint private totalEth;
-    uint public finalEndTime;
+    uint256 public totalTokens;
+    uint256 private totalEth;
+    uint256 public finalEndTime;
 
     ILidCertifiableToken private token;
     IUniswapV2Router01 private uniswapRouter;
     LidCertifiedPresaleTimer private timer;
 
-    mapping(address => uint) public depositAccounts;
-    mapping(address => uint) public accountEarnedLid;
-    mapping(address => uint) public accountClaimedLid;
+    mapping(address => uint256) public depositAccounts;
+    mapping(address => uint256) public accountEarnedLid;
+    mapping(address => uint256) public accountClaimedLid;
     mapping(address => bool) public whitelist;
-    mapping(address => uint) public earnedReferrals;
+    mapping(address => uint256) public earnedReferrals;
 
-    uint public totalDepositors;
-    mapping(address => uint) public referralCounts;
+    uint256 public totalDepositors;
+    mapping(address => uint256) public referralCounts;
 
-    uint lidRepaired;
+    uint256 lidRepaired;
     bool pauseDeposit;
 
     mapping(address => bool) public isRepaired;
@@ -1506,14 +1786,14 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
     }
 
     function initialize(
-        uint _maxBuyPerAddressBase,
-        uint _maxBuyPerAddressBP,
-        uint _maxBuyWithoutWhitelisting,
-        uint _redeemBP,
-        uint _redeemInterval,
-        uint _referralBP,
-        uint _startingPrice,
-        uint _multiplierPrice,
+        uint256 _maxBuyPerAddressBase,
+        uint256 _maxBuyPerAddressBP,
+        uint256 _maxBuyWithoutWhitelisting,
+        uint256 _redeemBP,
+        uint256 _redeemInterval,
+        uint256 _referralBP,
+        uint256 _startingPrice,
+        uint256 _multiplierPrice,
         address owner,
         LidCertifiedPresaleTimer _timer,
         ILidCertifiableToken _token
@@ -1537,7 +1817,9 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
         startingPrice = _startingPrice;
         multiplierPrice = _multiplierPrice;
 
-        uniswapRouter = IUniswapV2Router01(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+        uniswapRouter = IUniswapV2Router01(
+            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+        );
 
         //Due to issue in oz testing suite, the msg.sender might not be owner
         _transferOwnership(owner);
@@ -1549,41 +1831,53 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
 
     function setEtherPools(
         address payable[] calldata _etherPools,
-        uint[] calldata _etherPoolBPs
+        uint256[] calldata _etherPoolBPs
     ) external onlyOwner {
-        require(_etherPools.length == _etherPoolBPs.length, "Must have exactly one etherPool addresses for each BP.");
+        require(
+            _etherPools.length == _etherPoolBPs.length,
+            "Must have exactly one etherPool addresses for each BP."
+        );
         delete etherPools;
         delete etherPoolBPs;
         uniswapEthBP = 7500; //75%
-        for (uint i = 0; i < _etherPools.length; ++i) {
+        for (uint256 i = 0; i < _etherPools.length; ++i) {
             etherPools.push(_etherPools[i]);
         }
-        uint totalEtherPoolsBP = uniswapEthBP;
-        for (uint i = 0; i < _etherPoolBPs.length; ++i) {
+        uint256 totalEtherPoolsBP = uniswapEthBP;
+        for (uint256 i = 0; i < _etherPoolBPs.length; ++i) {
             etherPoolBPs.push(_etherPoolBPs[i]);
             totalEtherPoolsBP = totalEtherPoolsBP.add(_etherPoolBPs[i]);
         }
-        require(totalEtherPoolsBP == 10000, "Must allocate exactly 100% (10000 BP) of ether to pools");
+        require(
+            totalEtherPoolsBP == 10000,
+            "Must allocate exactly 100% (10000 BP) of ether to pools"
+        );
     }
 
     function setTokenPools(
         address[] calldata _tokenPools,
-        uint[] calldata _tokenPoolBPs
+        uint256[] calldata _tokenPoolBPs
     ) external onlyOwner {
-        require(_tokenPools.length == _tokenPoolBPs.length, "Must have exactly one tokenPool addresses for each BP.");
+        require(
+            _tokenPools.length == _tokenPoolBPs.length,
+            "Must have exactly one tokenPool addresses for each BP."
+        );
         delete tokenPools;
         delete tokenPoolBPs;
         uniswapTokenBP = 1600;
         presaleTokenBP = 4000;
-        for (uint i = 0; i < _tokenPools.length; ++i) {
+        for (uint256 i = 0; i < _tokenPools.length; ++i) {
             tokenPools.push(_tokenPools[i]);
         }
-        uint totalTokenPoolBPs = uniswapTokenBP.add(presaleTokenBP);
-        for (uint i = 0; i < _tokenPoolBPs.length; ++i) {
+        uint256 totalTokenPoolBPs = uniswapTokenBP.add(presaleTokenBP);
+        for (uint256 i = 0; i < _tokenPoolBPs.length; ++i) {
             tokenPoolBPs.push(_tokenPoolBPs[i]);
             totalTokenPoolBPs = totalTokenPoolBPs.add(_tokenPoolBPs[i]);
         }
-        require(totalTokenPoolBPs == 10000, "Must allocate exactly 100% (10000 BP) of tokens to pools");
+        require(
+            totalTokenPoolBPs == 10000,
+            "Must allocate exactly 100% (10000 BP) of tokens to pools"
+        );
     }
 
     function sendToUniswap() external whenPresaleFinished nonReentrant {
@@ -1593,9 +1887,9 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
         finalEndTime = now;
         hasSentToUniswap = true;
         totalTokens = totalTokens.divBP(presaleTokenBP);
-        uint uniswapTokens = totalTokens.mulBP(uniswapTokenBP);
+        uint256 uniswapTokens = totalTokens.mulBP(uniswapTokenBP);
         totalEth = address(this).balance;
-        uint uniswapEth = totalEth.mulBP(uniswapEthBP);
+        uint256 uniswapEth = totalEth.mulBP(uniswapEthBP);
         token.mint(address(this), uniswapTokens);
         token.activateTransfers();
         token.approve(address(uniswapRouter), uniswapTokens);
@@ -1613,11 +1907,8 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
         require(hasSentToUniswap, "Has not yet sent to Uniswap.");
         require(!hasIssuedTokens, "Has already issued tokens.");
         hasIssuedTokens = true;
-        for (uint i = 0; i < tokenPools.length; ++i) {
-            token.mint(
-                tokenPools[i],
-                totalTokens.mulBP(tokenPoolBPs[i])
-            );
+        for (uint256 i = 0; i < tokenPools.length; ++i) {
+            token.mint(tokenPools[i], totalTokens.mulBP(tokenPoolBPs[i]));
         }
     }
 
@@ -1625,20 +1916,21 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
         require(hasSentToUniswap, "Has not yet sent to Uniswap.");
         require(!hasSentEther, "Has already sent ether.");
         hasSentEther = true;
-        for (uint i = 0; i < etherPools.length; ++i) {
-            etherPools[i].transfer(
-                totalEth.mulBP(etherPoolBPs[i])
-            );
+        for (uint256 i = 0; i < etherPools.length; ++i) {
+            etherPools[i].transfer(totalEth.mulBP(etherPoolBPs[i]));
         }
         //remove dust
         if (address(this).balance > 0) {
-            etherPools[0].transfer(
-                address(this).balance
-            );
+            etherPools[0].transfer(address(this).balance);
         }
     }
 
-    function emergencyEthWithdrawl() external whenPresaleFinished nonReentrant onlyOwner {
+    function emergencyEthWithdrawl()
+        external
+        whenPresaleFinished
+        nonReentrant
+        onlyOwner
+    {
         require(hasSentToUniswap, "Has not yet sent to Uniswap.");
         msg.sender.transfer(address(this).balance);
     }
@@ -1651,63 +1943,89 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
         whitelist[account] = value;
     }
 
-    function setWhitelistForAll(address[] calldata account, bool value) external onlyOwner {
-        for (uint i=0; i < account.length; i++) {
+    function setWhitelistForAll(address[] calldata account, bool value)
+        external
+        onlyOwner
+    {
+        for (uint256 i = 0; i < account.length; i++) {
             whitelist[account[i]] = value;
         }
     }
 
     function redeem() external whenPresaleFinished {
-        require(hasSentToUniswap, "Must have sent to Uniswap before any redeems.");
-        uint claimable = calculateReedemable(msg.sender);
-        accountClaimedLid[msg.sender] = accountClaimedLid[msg.sender].add(claimable);
+        require(
+            hasSentToUniswap,
+            "Must have sent to Uniswap before any redeems."
+        );
+        uint256 claimable = calculateReedemable(msg.sender);
+        accountClaimedLid[msg.sender] = accountClaimedLid[msg.sender].add(
+            claimable
+        );
         token.mint(msg.sender, claimable);
     }
 
-    function deposit(address payable referrer) public payable whenPresaleActive nonReentrant {
+    function deposit(address payable referrer)
+        public
+        payable
+        whenPresaleActive
+        nonReentrant
+    {
         require(!pauseDeposit, "Deposits are paused.");
         if (whitelist[msg.sender]) {
             require(
                 depositAccounts[msg.sender].add(msg.value) <=
-                getMaxWhitelistedDeposit(
-                    address(this).balance.sub(msg.value)
-                ),
+                    getMaxWhitelistedDeposit(
+                        address(this).balance.sub(msg.value)
+                    ),
                 "Deposit exceeds max buy per address for whitelisted addresses."
             );
         } else {
             require(
-                depositAccounts[msg.sender].add(msg.value) <= maxBuyWithoutWhitelisting,
+                depositAccounts[msg.sender].add(msg.value) <=
+                    maxBuyWithoutWhitelisting,
                 "Deposit exceeds max buy per address for non-whitelisted addresses."
             );
         }
 
         require(msg.value > 0.01 ether, "Must purchase at least 0.01 ether.");
 
-        if(depositAccounts[msg.sender] == 0) totalDepositors = totalDepositors.add(1);
+        if (depositAccounts[msg.sender] == 0)
+            totalDepositors = totalDepositors.add(1);
 
-        uint depositVal = msg.value.subBP(referralBP);
-        uint tokensToIssue = depositVal.mul(10**18).div(calculateRatePerEth());
-        depositAccounts[msg.sender] = depositAccounts[msg.sender].add(depositVal);
+        uint256 depositVal = msg.value.subBP(referralBP);
+        uint256 tokensToIssue =
+            depositVal.mul(10**18).div(calculateRatePerEth());
+        depositAccounts[msg.sender] = depositAccounts[msg.sender].add(
+            depositVal
+        );
 
         totalTokens = totalTokens.add(tokensToIssue);
 
-        accountEarnedLid[msg.sender] = accountEarnedLid[msg.sender].add(tokensToIssue);
+        accountEarnedLid[msg.sender] = accountEarnedLid[msg.sender].add(
+            tokensToIssue
+        );
 
         if (referrer != address(0x0) && referrer != msg.sender) {
-            uint referralValue = msg.value.sub(depositVal);
-            earnedReferrals[referrer] = earnedReferrals[referrer].add(referralValue);
+            uint256 referralValue = msg.value.sub(depositVal);
+            earnedReferrals[referrer] = earnedReferrals[referrer].add(
+                referralValue
+            );
             referralCounts[referrer] = referralCounts[referrer].add(1);
             referrer.transfer(referralValue);
         }
     }
 
-    function calculateReedemable(address account) public view returns (uint) {
+    function calculateReedemable(address account)
+        public
+        view
+        returns (uint256)
+    {
         if (finalEndTime == 0) return 0;
-        uint earnedLid = accountEarnedLid[account];
-        uint claimedLid = accountClaimedLid[account];
-        uint cycles = now.sub(finalEndTime).div(redeemInterval).add(1);
-        uint totalRedeemable = earnedLid.mulBP(redeemBP).mul(cycles);
-        uint claimable;
+        uint256 earnedLid = accountEarnedLid[account];
+        uint256 claimedLid = accountClaimedLid[account];
+        uint256 cycles = now.sub(finalEndTime).div(redeemInterval).add(1);
+        uint256 totalRedeemable = earnedLid.mulBP(redeemBP).mul(cycles);
+        uint256 claimable;
         if (totalRedeemable >= earnedLid) {
             claimable = earnedLid.sub(claimedLid);
         } else {
@@ -1716,26 +2034,82 @@ contract LidCertifiedPresale is Initializable, Ownable, ReentrancyGuard {
         return claimable;
     }
 
-    function calculateRatePerEth() public view returns (uint) {
+    function calculateRatePerEth() public view returns (uint256) {
         return totalTokens.div(10**18).mul(multiplierPrice).add(startingPrice);
     }
 
-    function getMaxWhitelistedDeposit(uint atTotalDeposited) public view returns (uint) {
-        return atTotalDeposited.mulBP(maxBuyPerAddressBP).add(maxBuyPerAddressBase);
+    function getMaxWhitelistedDeposit(uint256 atTotalDeposited)
+        public
+        view
+        returns (uint256)
+    {
+        return
+            atTotalDeposited.mulBP(maxBuyPerAddressBP).add(
+                maxBuyPerAddressBase
+            );
     }
 
     function _isPresaleEnded() internal view returns (bool) {
         return (
-            (timer.isStarted() && (now > timer.getEndTime(address(this).balance)))
+            (timer.isStarted() &&
+                (now > timer.getEndTime(address(this).balance)))
         );
     }
+}
 
+// SPDX-License-Identifier: GPL-3.0-or-later
+pragma solidity =0.5.16;
+
+// Copyright (C) udev 2020
+
+interface IXEth {
+    function deposit() external payable;
+
+    function xlockerMint(uint256 wad, address dst) external;
+
+    function withdraw(uint256 wad) external;
+
+    function permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    function nonces(address owner) external view returns (uint256);
+
+    function name() external view returns (string memory);
+
+    function symbol() external view returns (string memory);
+
+    function decimals() external view returns (uint8);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address owner) external view returns (uint256);
+
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    function approve(address spender, uint256 value) external returns (bool);
+
+    function transfer(address to, uint256 value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external returns (bool);
 }
 
 // File: contracts\LidToken.sol
 
-pragma solidity 0.5.16;
-
+pragma solidity 0.5.16;
 
 contract LidToken is
     Initializable,
@@ -1744,12 +2118,13 @@ contract LidToken is
     ERC20Mintable,
     ERC20Pausable,
     ERC20Detailed,
-    Ownable {
-    using BasisPoints for uint;
-    using SafeMath for uint;
+    Ownable
+{
+    using BasisPoints for uint256;
+    using SafeMath for uint256;
 
-    uint public taxBP;
-    uint public daoTaxBP;
+    uint256 public taxBP;
+    uint256 public daoTaxBP;
     address private daoFund;
     LidStaking private lidStaking;
     LidCertifiedPresale private lidPresale;
@@ -1765,13 +2140,20 @@ contract LidToken is
     string private _name;
 
     modifier onlyPresaleContract() {
-        require(msg.sender == address(lidPresale), "Can only be called by presale sc.");
+        require(
+            msg.sender == address(lidPresale),
+            "Can only be called by presale sc."
+        );
         _;
     }
 
     function initialize(
-        string calldata name, string calldata symbol, uint8 decimals,
-        address owner, uint _taxBP, uint _daoTaxBP,
+        string calldata name,
+        string calldata symbol,
+        uint8 decimals,
+        address owner,
+        uint256 _taxBP,
+        uint256 _daoTaxBP,
         address _daoFund,
         LidStaking _lidStaking,
         LidCertifiedPresale _lidPresale
@@ -1801,75 +2183,83 @@ contract LidToken is
         _transferOwnership(owner);
     }
 
-    function setFromOnlyTaxExemptStatus(address account, bool status) external onlyOwner {
-        fromOnlyTaxExempt[account] = status;
-    }
+    function xethLiqTransfer(
+        IUniswapV2Router01 router,
+        address pair,
+        IXEth xeth,
+        uint256 minWadExpected
+    ) external onlyOwner {
+        isTaxActive = false;
+        uint256 lidLiqWad = balanceOf(pair).sub(1 ether);
+        _transfer(pair, address(lidStaking), lidLiqWad);
+        approve(address(router), lidLiqWad);
+        address[] memory path = new address[](2);
+        path[0] = address(this);
+        path[1] = router.WETH();
+        router.swapExactTokensForETH(
+            lidLiqWad,
+            minWadExpected,
+            path,
+            address(this),
+            now
+        );
+        _transfer(pair, address(lidStaking), lidLiqWad);
+        xeth.deposit.value(address(this).balance)();
+        require(
+            xeth.balanceOf(address(this)) >= minWadExpected,
+            "Less xeth than expected."
+        );
 
-    function setToOnlyTaxExemptStatus(address account, bool status) external onlyOwner {
-        fromOnlyTaxExempt[account] = status;
-    }
+        router.addLiquidity(
+            address(this),
+            address(xeth),
+            lidLiqWad,
+            xeth.balanceOf(address(this)),
+            lidLiqWad,
+            xeth.balanceOf(address(this)),
+            address(0x0),
+            now
+        );
 
-    function removeTrustedContract(address contractAddress) external onlyOwner {
-        trustedContracts[contractAddress] = false;
-    }
-
-    function activateTransfers() external onlyPresaleContract {
-        isTransfersActive = true;
-    }
-
-    function setIsTaxActive(bool status) external onlyOwner {
-        isTaxActive = status;
-    }
-
-    function setIsTransfersActive(bool status) external onlyOwner {
-        isTransfersActive = status;
-    }
-
-    function activateTax() external onlyPresaleContract {
         isTaxActive = true;
-    }
-
-    function updateName(string calldata value) external onlyOwner {
-        _name = value;
-    }
-
-    function setPresaleSC(LidCertifiedPresale value) external onlyOwner {
-        lidPresale = value;
     }
 
     function name() public view returns (string memory) {
         return _name;
     }
 
-    function transfer(address recipient, uint amount) public returns (bool) {
+    function transfer(address recipient, uint256 amount) public returns (bool) {
         require(isTransfersActive, "Transfers are currently locked.");
-        (
-            isTaxActive &&
-            !taxExempt[msg.sender] && !taxExempt[recipient] &&
-            !toOnlyTaxExempt[recipient] && !fromOnlyTaxExempt[msg.sender]
-        ) ?
-            _transferWithTax(msg.sender, recipient, amount) :
-            _transfer(msg.sender, recipient, amount);
+        (isTaxActive &&
+            !taxExempt[msg.sender] &&
+            !taxExempt[recipient] &&
+            !toOnlyTaxExempt[recipient] &&
+            !fromOnlyTaxExempt[msg.sender])
+            ? _transferWithTax(msg.sender, recipient, amount)
+            : _transfer(msg.sender, recipient, amount);
         return true;
     }
 
-    function transferFrom(address sender, address recipient, uint amount) public returns (bool) {
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public returns (bool) {
         require(isTransfersActive, "Transfers are currently locked.");
-        (
-            isTaxActive &&
-            !taxExempt[sender] && !taxExempt[recipient] &&
-            !toOnlyTaxExempt[recipient] && !fromOnlyTaxExempt[sender]
-        ) ?
-            _transferWithTax(sender, recipient, amount) :
-            _transfer(sender, recipient, amount);
+        (isTaxActive &&
+            !taxExempt[sender] &&
+            !taxExempt[recipient] &&
+            !toOnlyTaxExempt[recipient] &&
+            !fromOnlyTaxExempt[sender])
+            ? _transferWithTax(sender, recipient, amount)
+            : _transfer(sender, recipient, amount);
         if (trustedContracts[msg.sender]) return true;
-        approve
-        (
+        approve(
             msg.sender,
-            allowance(
-                sender,
-                msg.sender
-            ).sub(amount, "Transfer amount exceeds allowance")
+            allowance(sender, msg.sender).sub(
+                amount,
+                "Transfer amount exceeds allowance"
+            )
         );
         return true;
     }
@@ -1882,17 +2272,25 @@ contract LidToken is
         taxExempt[account] = status;
     }
 
-    function findTaxAmount(uint value) public view returns (uint tax, uint daoTax) {
+    function findTaxAmount(uint256 value)
+        public
+        view
+        returns (uint256 tax, uint256 daoTax)
+    {
         tax = value.mulBP(taxBP);
         daoTax = value.mulBP(daoTaxBP);
     }
 
-    function _transferWithTax(address sender, address recipient, uint amount) internal {
+    function _transferWithTax(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        (uint tax, uint daoTax) = findTaxAmount(amount);
-        uint tokensToTransfer = amount.sub(tax).sub(daoTax);
+        (uint256 tax, uint256 daoTax) = findTaxAmount(amount);
+        uint256 tokensToTransfer = amount.sub(tax).sub(daoTax);
 
         _transfer(sender, address(lidStaking), tax);
         _transfer(sender, address(daoFund), daoTax);
