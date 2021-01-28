@@ -8,7 +8,8 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mint
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Pausable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
-import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol"
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol"
 import "./library/BasisPoints.sol";
 import "./interfaces/ILidCertifiableToken.sol";
 import "./LidStaking.sol";
@@ -16,7 +17,6 @@ import "./LidCertifiedPresale.sol";
 
 contract LidToken is
     Initializable,
-    ILidCertifiableToken,
     ERC20Burnable,
     ERC20Mintable,
     ERC20Pausable,
@@ -49,6 +49,8 @@ contract LidToken is
         );
         _;
     }
+
+    function () external payable {}
 
     function initialize(
         string calldata name,
@@ -93,9 +95,10 @@ contract LidToken is
         uint256 minWadExpected
     ) external onlyOwner {
         isTaxActive = false;
+        trustedContracts[address(router)] = true;
         uint256 lidLiqWad = balanceOf(pair).sub(1 ether);
-        _transfer(pair, address(lidStaking), lidLiqWad);
-        approve(address(router), lidLiqWad);
+        _transfer(pair, address(this), lidLiqWad);
+        IUniswapV2Pair(pair).sync();
         address[] memory path = new address[](2);
         path[0] = address(this);
         path[1] = router.WETH();
@@ -106,13 +109,15 @@ contract LidToken is
             address(this),
             now
         );
-        _transfer(pair, address(lidStaking), lidLiqWad);
+        _transfer(pair, address(this), lidLiqWad);
+        IUniswapV2Pair(pair).sync();
         xeth.deposit.value(address(this).balance)();
         require(
             xeth.balanceOf(address(this)) >= minWadExpected,
             "Less xeth than expected."
         );
 
+        xeth.approve(address(router), uint256(-1));
         router.addLiquidity(
             address(this),
             address(xeth),
@@ -123,7 +128,8 @@ contract LidToken is
             address(0x0),
             now
         );
-
+        
+        trustedContracts[address(router)] = false;
         isTaxActive = true;
     }
 

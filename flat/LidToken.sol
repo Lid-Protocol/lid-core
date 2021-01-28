@@ -2113,7 +2113,6 @@ pragma solidity 0.5.16;
 
 contract LidToken is
     Initializable,
-    ILidCertifiableToken,
     ERC20Burnable,
     ERC20Mintable,
     ERC20Pausable,
@@ -2146,6 +2145,8 @@ contract LidToken is
         );
         _;
     }
+
+    function() external payable {}
 
     function initialize(
         string calldata name,
