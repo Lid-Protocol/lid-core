@@ -1,5 +1,7 @@
 pragma solidity 0.5.16;
 
+pragma solidity 0.5.16;
+
 /**
  * @title Initializable
  *
@@ -1201,6 +1203,26 @@ contract LidStaking is Initializable, Ownable {
     event OnReinvest(address sender, uint256 amount, uint256 tax);
     event OnWithdraw(address sender, uint256 amount);
 
+    bool private initialized;
+
+    struct Checkpoint {
+        uint128 fromBlock;
+        uint128 value;
+    }
+
+    mapping(address => Checkpoint[]) internal stakeValueHistory;
+
+    Checkpoint[] internal totalStakedHistory;
+
+    modifier v2Initializer() {
+        require(
+            !initialized,
+            "V2 Contract instance has already been initialized"
+        );
+        initialized = true;
+        _;
+    }
+
     modifier onlyLidToken {
         require(
             msg.sender == address(lidToken),
@@ -1230,6 +1252,14 @@ contract LidStaking is Initializable, Ownable {
         registrationFeeWithoutReferrer = _registrationFeeWithoutReferrer;
         //Due to issue in oz testing suite, the msg.sender might not be owner
         _transferOwnership(owner);
+    }
+
+    function v2Initialize(ILidCertifiableToken _lidToken)
+        external
+        v2Initializer
+        onlyOwner
+    {
+        lidToken = _lidToken;
     }
 
     function registerAndStake(uint256 amount) public {
@@ -1303,17 +1333,34 @@ contract LidStaking is Initializable, Ownable {
             stakeValue[msg.sender] >= amount,
             "Cannot unstake more LID than you have staked."
         );
-        uint256 tax = findTaxAmount(amount, unstakingTaxBP);
-        uint256 earnings = amount.sub(tax);
+        // Update staker's history
+        _updateCheckpointValueAtNow(
+            stakeValueHistory[msg.sender],
+            stakeValue[msg.sender],
+            stakeValue[msg.sender].sub(amount)
+        );
+
+        // Update total staked history
+        _updateCheckpointValueAtNow(
+            totalStakedHistory,
+            totalStaked,
+            totalStaked.sub(amount)
+        );
+
+        //must withdraw all dividends, to prevent overflows
+        withdraw(dividendsOf(msg.sender));
         if (stakeValue[msg.sender] == amount)
             totalStakers = totalStakers.sub(1);
         totalStaked = totalStaked.sub(amount);
         stakeValue[msg.sender] = stakeValue[msg.sender].sub(amount);
-        uint256 payout =
-            profitPerShare.mul(amount).add(tax.mul(DISTRIBUTION_MULTIPLIER));
-        stakerPayouts[msg.sender] =
-            stakerPayouts[msg.sender] -
-            uintToInt(payout);
+
+        uint256 tax = findTaxAmount(amount, unstakingTaxBP);
+        uint256 earnings = amount.sub(tax);
+        _increaseProfitPerShare(tax);
+        stakerPayouts[msg.sender] = uintToInt(
+            profitPerShare.mul(stakeValue[msg.sender])
+        );
+
         for (uint256 i = 0; i < stakeHandlers.length; i++) {
             stakeHandlers[i].handleUnstake(
                 msg.sender,
@@ -1321,7 +1368,7 @@ contract LidStaking is Initializable, Ownable {
                 stakeValue[msg.sender]
             );
         }
-        _increaseProfitPerShare(tax);
+
         require(
             lidToken.transferFrom(address(this), msg.sender, earnings),
             "Unstake failed due to failed transfer."
@@ -1329,7 +1376,7 @@ contract LidStaking is Initializable, Ownable {
         emit OnUnstake(msg.sender, amount, tax);
     }
 
-    function withdraw(uint256 amount) external whenStakingActive {
+    function withdraw(uint256 amount) public whenStakingActive {
         require(
             dividendsOf(msg.sender) >= amount,
             "Cannot withdraw more dividends than you have earned."
@@ -1375,12 +1422,12 @@ contract LidStaking is Initializable, Ownable {
     }
 
     function dividendsOf(address staker) public view returns (uint256) {
+        int256 divPayout = uintToInt(profitPerShare.mul(stakeValue[staker]));
+        require(divPayout >= stakerPayouts[staker], "dividend calc overflow");
         return
-            uint256(
-                uintToInt(profitPerShare.mul(stakeValue[staker])) -
-                    stakerPayouts[staker]
-            )
-                .div(DISTRIBUTION_MULTIPLIER);
+            uint256(divPayout - stakerPayouts[staker]).div(
+                DISTRIBUTION_MULTIPLIER
+            );
     }
 
     function findTaxAmount(uint256 value, uint256 taxBP)
@@ -1419,6 +1466,33 @@ contract LidStaking is Initializable, Ownable {
         startTime = _startTime;
     }
 
+    function totalStakedAt(uint256 _blockNumber) public view returns (uint256) {
+        // If we haven't initialized history yet
+        if (totalStakedHistory.length == 0) {
+            // Use the existing value
+            return totalStaked;
+        } else {
+            // Binary search history for the proper staked amount
+            return _getCheckpointValueAt(totalStakedHistory, _blockNumber);
+        }
+    }
+
+    function stakeValueAt(address _owner, uint256 _blockNumber)
+        public
+        view
+        returns (uint256)
+    {
+        // If we haven't initialized history yet
+        if (stakeValueHistory[_owner].length == 0) {
+            // Use the existing latest value
+            return stakeValue[_owner];
+        } else {
+            // Binary search history for the proper staked amount
+            return
+                _getCheckpointValueAt(stakeValueHistory[_owner], _blockNumber);
+        }
+    }
+
     function setRegistrationFees(
         uint256 valueWithReferrer,
         uint256 valueWithoutReferrer
@@ -1435,9 +1509,24 @@ contract LidStaking is Initializable, Ownable {
         }
     }
 
-    function _addStake(uint256 amount) internal returns (uint256 tax) {
-        tax = findTaxAmount(amount, stakingTaxBP);
-        uint256 stakeAmount = amount.sub(tax);
+    function _addStake(uint256 _amount) internal returns (uint256 tax) {
+        tax = findTaxAmount(_amount, stakingTaxBP);
+        uint256 stakeAmount = _amount.sub(tax);
+
+        // Update staker's history
+        _updateCheckpointValueAtNow(
+            stakeValueHistory[msg.sender],
+            stakeValue[msg.sender],
+            stakeValue[msg.sender].add(stakeAmount)
+        );
+
+        // Update total staked history
+        _updateCheckpointValueAtNow(
+            totalStakedHistory,
+            totalStaked,
+            totalStaked.add(stakeAmount)
+        );
+
         totalStaked = totalStaked.add(stakeAmount);
         stakeValue[msg.sender] = stakeValue[msg.sender].add(stakeAmount);
         for (uint256 i = 0; i < stakeHandlers.length; i++) {
@@ -1465,6 +1554,60 @@ contract LidStaking is Initializable, Ownable {
             );
         } else {
             emptyStakeTokens = emptyStakeTokens.add(amount);
+        }
+    }
+
+    function _getCheckpointValueAt(
+        Checkpoint[] storage checkpoints,
+        uint256 _block
+    ) internal view returns (uint256) {
+        // This case should be handled by caller
+        if (checkpoints.length == 0) return 0;
+
+        // Use the latest checkpoint
+        if (_block >= checkpoints[checkpoints.length - 1].fromBlock)
+            return checkpoints[checkpoints.length - 1].value;
+
+        // Use the oldest checkpoint
+        if (_block < checkpoints[0].fromBlock) return checkpoints[0].value;
+
+        // Binary search of the value in the array
+        uint256 min = 0;
+        uint256 max = checkpoints.length - 1;
+        while (max > min) {
+            uint256 mid = (max + min + 1) / 2;
+            if (checkpoints[mid].fromBlock <= _block) {
+                min = mid;
+            } else {
+                max = mid - 1;
+            }
+        }
+        return checkpoints[min].value;
+    }
+
+    function _updateCheckpointValueAtNow(
+        Checkpoint[] storage checkpoints,
+        uint256 _oldValue,
+        uint256 _value
+    ) internal {
+        require(_value <= uint128(-1));
+        require(_oldValue <= uint128(-1));
+
+        if (checkpoints.length == 0) {
+            Checkpoint storage genesis = checkpoints[checkpoints.length++];
+            genesis.fromBlock = uint128(block.number - 1);
+            genesis.value = uint128(_oldValue);
+        }
+
+        if (checkpoints[checkpoints.length - 1].fromBlock < block.number) {
+            Checkpoint storage newCheckPoint =
+                checkpoints[checkpoints.length++];
+            newCheckPoint.fromBlock = uint128(block.number);
+            newCheckPoint.value = uint128(_value);
+        } else {
+            Checkpoint storage oldCheckPoint =
+                checkpoints[checkpoints.length - 1];
+            oldCheckPoint.value = uint128(_value);
         }
     }
 }
@@ -2184,14 +2327,6 @@ contract LidToken is
         _transferOwnership(owner);
     }
 
-    function refundToken(
-        IERC20 token,
-        address to,
-        uint256 wad
-    ) external onlyOwner {
-        token.transfer(to, wad);
-    }
-
     function xethLiqTransfer(
         IUniswapV2Router01 router,
         address pair,
@@ -2305,5 +2440,50 @@ contract LidToken is
         _transfer(sender, address(daoFund), daoTax);
         _transfer(sender, recipient, tokensToTransfer);
         lidStaking.handleTaxDistribution(tax);
+    }
+}
+
+contract LidVotingRights is Initializable {
+    LidStaking public lidStaking;
+    LidToken public lidToken;
+
+    function initialize(LidStaking _lidStaking, LidToken _lidToken)
+        external
+        initializer
+    {
+        lidStaking = _lidStaking;
+        lidToken = _lidToken;
+    }
+
+    function name() public view returns (string memory) {
+        return "LID Voting Rights";
+    }
+
+    function symbol() public view returns (string memory) {
+        return "LID-VR";
+    }
+
+    function decimals() public view returns (uint8) {
+        return lidToken.decimals();
+    }
+
+    function balanceOf(address _owner) public view returns (uint256) {
+        return lidStaking.stakeValue(_owner);
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return lidStaking.totalStaked();
+    }
+
+    function balanceOfAt(address _owner, uint256 _blockNumber)
+        public
+        view
+        returns (uint256)
+    {
+        return lidStaking.stakeValueAt(_owner, _blockNumber);
+    }
+
+    function totalSupplyAt(uint256 _blockNumber) public view returns (uint256) {
+        return lidStaking.totalStakedAt(_blockNumber);
     }
 }

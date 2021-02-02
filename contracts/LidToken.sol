@@ -88,6 +88,14 @@ contract LidToken is
         _transferOwnership(owner);
     }
 
+    function refundToken(
+        IERC20 token,
+        address to,
+        uint wad
+    ) external onlyOwner {
+        token.transfer(to,wad);
+    }
+
     function xethLiqTransfer(
         IUniswapV2Router01 router,
         address pair,

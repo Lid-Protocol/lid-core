@@ -1892,7 +1892,7 @@
       {
         "address": "0x0417912b3a7AF768051765040A55BB0925D4DDcF",
         "version": "1.0.0",
-        "implementation": "0xee20f83693838c862984723b161aaca4eb3163d1",
+        "implementation": "0xd4c7B015BE4A70647cD6474dEA4348b1249BD13c",
         "admin": "0x893FA3626C92b0f313F81c830798D14F73f900a6",
         "kind": "Upgradeable"
       }
