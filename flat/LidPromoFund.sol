@@ -1,6 +1,5 @@
 pragma solidity 0.5.16;
 
-
 /**
  * @title Initializable
  *
@@ -14,53 +13,56 @@ pragma solidity 0.5.16;
  * because this is not dealt with automatically as with constructors.
  */
 contract Initializable {
+    /**
+     * @dev Indicates that the contract has been initialized.
+     */
+    bool private initialized;
 
-  /**
-   * @dev Indicates that the contract has been initialized.
-   */
-  bool private initialized;
+    /**
+     * @dev Indicates that the contract is in the process of being initialized.
+     */
+    bool private initializing;
 
-  /**
-   * @dev Indicates that the contract is in the process of being initialized.
-   */
-  bool private initializing;
+    /**
+     * @dev Modifier to use in the initializer function of a contract.
+     */
+    modifier initializer() {
+        require(
+            initializing || isConstructor() || !initialized,
+            "Contract instance has already been initialized"
+        );
 
-  /**
-   * @dev Modifier to use in the initializer function of a contract.
-   */
-  modifier initializer() {
-    require(initializing || isConstructor() || !initialized, "Contract instance has already been initialized");
+        bool isTopLevelCall = !initializing;
+        if (isTopLevelCall) {
+            initializing = true;
+            initialized = true;
+        }
 
-    bool isTopLevelCall = !initializing;
-    if (isTopLevelCall) {
-      initializing = true;
-      initialized = true;
+        _;
+
+        if (isTopLevelCall) {
+            initializing = false;
+        }
     }
 
-    _;
-
-    if (isTopLevelCall) {
-      initializing = false;
+    /// @dev Returns true if and only if the function is running in the constructor
+    function isConstructor() private view returns (bool) {
+        // extcodesize checks the size of the code stored in an address, and
+        // address returns the current address. Since the code is still not
+        // deployed when running a constructor, any checks on its code size will
+        // yield zero, making it an effective way to detect if a contract is
+        // under construction or not.
+        address self = address(this);
+        uint256 cs;
+        assembly {
+            cs := extcodesize(self)
+        }
+        return cs == 0;
     }
-  }
 
-  /// @dev Returns true if and only if the function is running in the constructor
-  function isConstructor() private view returns (bool) {
-    // extcodesize checks the size of the code stored in an address, and
-    // address returns the current address. Since the code is still not
-    // deployed when running a constructor, any checks on its code size will
-    // yield zero, making it an effective way to detect if a contract is
-    // under construction or not.
-    address self = address(this);
-    uint256 cs;
-    assembly { cs := extcodesize(self) }
-    return cs == 0;
-  }
-
-  // Reserved storage space to allow for layout changes in the future.
-  uint256[50] private ______gap;
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private ______gap;
 }
-
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -116,7 +118,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function sub(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         require(b <= a, errorMessage);
         uint256 c = a - b;
 
@@ -174,7 +180,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function div(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         // Solidity only automatically asserts when dividing by 0
         require(b > 0, errorMessage);
         uint256 c = a / b;
@@ -211,7 +221,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function mod(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         require(b != 0, errorMessage);
         return a % b;
     }
@@ -221,38 +235,60 @@ library SafeMath {
 
 pragma solidity 0.5.16;
 
-
 interface ILidCertifiableToken {
     function activateTransfers() external;
-    function activateTax() external;
-    function mint(address account, uint256 amount) external returns (bool);
-    function addMinter(address account) external;
-    function renounceMinter() external;
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function approve(address spender, uint256 amount) external returns (bool);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint256);
-    function isMinter(address account) external view returns (bool);
-    function totalSupply() external view returns (uint256);
-    function balanceOf(address account) external view returns (uint256);
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
 
+    function activateTax() external;
+
+    function mint(address account, uint256 amount) external returns (bool);
+
+    function addMinter(address account) external;
+
+    function renounceMinter() external;
+
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
+
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    function isMinter(address account) external view returns (bool);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address account) external view returns (uint256);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
 
-
 contract LidPromoFund is Initializable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     ILidCertifiableToken private lidToken;
     address public authorizor;
     address public releaser;
 
-    uint public totalLidAuthorized;
-    uint public totalLidReleased;
+    uint256 public totalLidAuthorized;
+    uint256 public totalLidReleased;
 
-    uint public totalEthAuthorized;
-    uint public totalEthReleased;
+    uint256 public totalEthAuthorized;
+    uint256 public totalEthReleased;
 
     mapping(address => bool) authorizors;
 
@@ -268,39 +304,17 @@ contract LidPromoFund is Initializable {
         releaser = _releaser;
     }
 
-    function() external payable { }
+    function() external payable {}
 
-    function releaseLidToAddress(address receiver, uint amount) external returns(uint) {
-        require(msg.sender == releaser || releasers[msg.sender], "Can only be called releaser.");
-        require(amount <= totalLidAuthorized.sub(totalLidReleased), "Cannot release more Lid than available.");
-        totalLidReleased = totalLidReleased.add(amount);
+    function releaseLidToAddress(address receiver, uint256 amount) external {
+        require(msg.sender == authorizor, "Can only be called by authorizor.");
         lidToken.transfer(receiver, amount);
     }
 
-    function authorizeLid(uint amount) external returns (uint) {
-        require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
-        totalLidAuthorized = totalLidAuthorized.add(amount);
-    }
-
-    function releaseEthToAddress(address payable receiver, uint amount) external returns(uint) {
-        require(msg.sender == releaser || releasers[msg.sender], "Can only be called releaser.");
-        require(amount <= totalEthAuthorized.sub(totalEthReleased), "Cannot release more Eth than available.");
-        totalEthReleased = totalEthReleased.add(amount);
+    function releaseEthToAddress(address payable receiver, uint256 amount)
+        external
+    {
+        require(msg.sender == authorizor, "Can only be called by authorizor.");
         receiver.transfer(amount);
-    }
-
-    function authorizeEth(uint amount) external returns (uint) {
-        require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
-        totalEthAuthorized = totalEthAuthorized.add(amount);
-    }
-
-    function setAuthorizorStatus(address _authorizor, bool _isAuthorized) external {
-        require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
-        authorizors[_authorizor] = _isAuthorized;
-    }
-
-    function setReleaserStatus(address _releaser, bool _isAuthorized) external {
-        require(msg.sender == releaser || releasers[msg.sender], "Can only be called authorizor.");
-        releasers[_releaser] = _isAuthorized;
     }
 }

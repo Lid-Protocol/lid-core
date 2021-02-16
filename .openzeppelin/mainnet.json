@@ -1928,7 +1928,7 @@
       {
         "address": "0x71A442F174EA408f762624981c07Ca3F800Aa72E",
         "version": "1.0.0",
-        "implementation": "0xdBaf7f1675BF528962b1b8e035eBC73771eE30cb",
+        "implementation": "0x82084101496dD7D58715c8f0dA1B77EBc583a7ff",
         "admin": "0x893FA3626C92b0f313F81c830798D14F73f900a6",
         "kind": "Upgradeable"
       }

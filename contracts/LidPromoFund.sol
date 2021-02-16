@@ -4,19 +4,18 @@ import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "./interfaces/ILidCertifiableToken.sol";
 
-
 contract LidPromoFund is Initializable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     ILidCertifiableToken private lidToken;
     address public authorizor;
     address public releaser;
 
-    uint public totalLidAuthorized;
-    uint public totalLidReleased;
+    uint256 public totalLidAuthorized;
+    uint256 public totalLidReleased;
 
-    uint public totalEthAuthorized;
-    uint public totalEthReleased;
+    uint256 public totalEthAuthorized;
+    uint256 public totalEthReleased;
 
     mapping(address => bool) authorizors;
 
@@ -32,39 +31,17 @@ contract LidPromoFund is Initializable {
         releaser = _releaser;
     }
 
-    function() external payable { }
+    function() external payable {}
 
-    function releaseLidToAddress(address receiver, uint amount) external {
-        require(msg.sender == releaser || releasers[msg.sender], "Can only be called releaser.");
-        require(amount <= totalLidAuthorized.sub(totalLidReleased), "Cannot release more Lid than available.");
-        totalLidReleased = totalLidReleased.add(amount);
+    function releaseLidToAddress(address receiver, uint256 amount) external {
+        require(msg.sender == authorizor, "Can only be called by authorizor.");
         lidToken.transfer(receiver, amount);
     }
 
-    function authorizeLid(uint amount) external {
-        require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
-        totalLidAuthorized = totalLidAuthorized.add(amount);
-    }
-
-    function releaseEthToAddress(address payable receiver, uint amount) external {
-        require(msg.sender == releaser || releasers[msg.sender], "Can only be called releaser.");
-        require(amount <= totalEthAuthorized.sub(totalEthReleased), "Cannot release more Eth than available.");
-        totalEthReleased = totalEthReleased.add(amount);
+    function releaseEthToAddress(address payable receiver, uint256 amount)
+        external
+    {
+        require(msg.sender == authorizor, "Can only be called by authorizor.");
         receiver.transfer(amount);
-    }
-
-    function authorizeEth(uint amount) external {
-        require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
-        totalEthAuthorized = totalEthAuthorized.add(amount);
-    }
-
-    function setAuthorizorStatus(address _authorizor, bool _isAuthorized) external {
-        require(msg.sender == authorizor || authorizors[msg.sender], "Can only be called authorizor.");
-        authorizors[_authorizor] = _isAuthorized;
-    }
-
-    function setReleaserStatus(address _releaser, bool _isAuthorized) external {
-        require(msg.sender == releaser || releasers[msg.sender], "Can only be called authorizor.");
-        releasers[_releaser] = _isAuthorized;
     }
 }
